@@ -19,7 +19,7 @@
 ## 本地运行
 
 ```bash
-node server.js
+npm.cmd start
 ```
 
 然后打开：
@@ -31,7 +31,7 @@ http://localhost:4273
 也可以运行：
 
 ```bash
-npm.cmd start
+node scripts/local-server.js
 ```
 
 ## 在线部署
@@ -44,10 +44,10 @@ npm.cmd start
 4. 选择 `xiekaiyuekai-netizen/tum-ai-studienberatung`
 5. Framework Preset 选择 `Other`
 6. Build Command 使用 `node build.js`
-7. Output Directory 使用 `dist`
+7. Output Directory 使用 `public`
 8. 点击 `Deploy`
 
-这个项目是静态页面，不依赖后端 API。部署时会通过 `build.js` 把 `index.html` 和 `src/` 复制到 `dist/`，Vercel 会托管 `dist`。
+这个项目是静态页面，不依赖后端 API。部署时会通过 `build.js` 把 `index.html` 和 `src/` 复制到 `public/`，Vercel 会托管 `public`。本地的开发服务器放在 `scripts/local-server.js`，不会作为 Vercel Serverless Function 运行。
 
 ## 功能
 
