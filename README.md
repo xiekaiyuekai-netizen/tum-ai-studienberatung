@@ -43,11 +43,11 @@ npm.cmd start
 3. 点击 `Add New Project`
 4. 选择 `xiekaiyuekai-netizen/tum-ai-studienberatung`
 5. Framework Preset 选择 `Other`
-6. Build Command 留空
-7. Output Directory 留空
+6. Build Command 使用 `node build.js`
+7. Output Directory 使用 `dist`
 8. 点击 `Deploy`
 
-这个项目是静态页面，不依赖后端 API。Vercel 会直接托管 `index.html`、`src/app.js` 和 `src/styles.css`。
+这个项目是静态页面，不依赖后端 API。部署时会通过 `build.js` 把 `index.html` 和 `src/` 复制到 `dist/`，Vercel 会托管 `dist`。
 
 ## 功能
 

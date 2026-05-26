@@ -4,6 +4,7 @@
   "private": true,
   "description": "A simple Chinese TUM application advising demo for prospective students.",
   "scripts": {
+    "build": "node build.js",
     "start": "node server.js"
   }
 }
