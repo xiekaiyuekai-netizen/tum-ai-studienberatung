@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TUM AI 申请咨询助手</title>
+    <link rel="stylesheet" href="src/styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">T</div>
+          <div>
+            <strong>TUM 申请咨询助手</strong>
+            <span>非官方 Demo</span>
+          </div>
+        </div>
+
+        <nav class="nav-list" aria-label="页面导航">
+          <button class="nav-item active" data-target="advisor" type="button">问答助手</button>
+          <button class="nav-item" data-target="checklist" type="button">材料清单</button>
+          <button class="nav-item" data-target="timeline" type="button">申请流程</button>
+          <button class="nav-item" data-target="glossary" type="button">材料术语</button>
+          <button class="nav-item" data-target="sources" type="button">官方来源</button>
+        </nav>
+
+        <div class="notice">
+          <strong>Important</strong>
+          <p>本工具仅用于演示和学习，最终要求以 TUM 官网和 TUMonline 清单为准。</p>
+        </div>
+      </aside>
+
+      <section class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Applicant assistant</p>
+            <h1>TUM AI 申请咨询助手</h1>
+            <p class="subtitle">面向申请者的中文答疑工具，帮助理解申请流程、VPD、APS、语言证明和材料准备。</p>
+          </div>
+          <button id="resetBtn" class="ghost-button" type="button">重置</button>
+        </header>
+
+        <section class="profile-panel panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">申请画像</p>
+              <h2>先告诉我你的申请情况</h2>
+            </div>
+            <span id="readinessBadge" class="badge">准备度 0%</span>
+          </div>
+
+          <div class="profile-grid">
+            <label>
+              申请阶段
+              <select id="degreeSelect">
+                <option value="master">Master</option>
+                <option value="bachelor">Bachelor</option>
+              </select>
+            </label>
+            <label>
+              申请类型
+              <select id="applicationTypeSelect">
+                <option value="first-semester">第一学期入学</option>
+                <option value="higher-semester">更高 Fachsemester</option>
+              </select>
+            </label>
+            <label>
+              学历来源
+              <select id="qualificationSelect">
+                <option value="outside-germany">德国以外</option>
+                <option value="germany">德国</option>
+              </select>
+            </label>
+            <label>
+              学历国家/地区
+              <select id="countrySelect">
+                <option value="china">中国</option>
+                <option value="india">印度</option>
+                <option value="vietnam">越南</option>
+                <option value="eu">欧盟/欧洲经济区</option>
+                <option value="other">其他国家/地区</option>
+              </select>
+            </label>
+            <label>
+              项目授课语言
+              <select id="languageSelect">
+                <option value="english">英语</option>
+                <option value="german">德语</option>
+                <option value="mixed">英德混合</option>
+              </select>
+            </label>
+            <label>
+              VPD 状态
+              <select id="vpdSelect">
+                <option value="not-started">还没申请</option>
+                <option value="submitted">已向 uni-assist 提交</option>
+                <option value="received">已收到最终 VPD</option>
+                <option value="not-needed">不确定/可能不需要</option>
+              </select>
+            </label>
+            <label>
+              目标学期
+              <select id="semesterSelect">
+                <option value="winter">Winter Semester</option>
+                <option value="summer">Summer Semester</option>
+              </select>
+            </label>
+          </div>
+        </section>
+
+        <section id="advisor" class="advisor-grid">
+          <section class="panel chat-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">AI 问答</p>
+                <h2>问一个申请问题</h2>
+              </div>
+              <span id="intentBadge" class="badge muted">等待提问</span>
+            </div>
+
+            <form id="questionForm" class="question-form">
+              <textarea id="questionInput" rows="4" placeholder="例如：我在中国读本科，申请 TUM Master 需要 VPD 和 APS 吗？"></textarea>
+              <div class="quick-questions" aria-label="常见问题">
+                <button type="button" data-question="我在中国读本科，申请 TUM Master 需要 VPD 和 APS 吗？">VPD + APS</button>
+                <button type="button" data-question="申请 TUM 是先做 uni-assist，还是先在 TUMonline 提交？">申请顺序</button>
+                <button type="button" data-question="语言证明什么时候上传？可以之后补交吗？">语言证明</button>
+                <button type="button" data-question="我需要上传公证件吗？">材料格式</button>
+                <button type="button" data-question="我已经在别的大学读过相关课程，可以申请 TUM 更高 Fachsemester 吗？">高年级入学</button>
+                <button type="button" data-question="TUM 的 aptitude assessment 是什么？会面试吗？">录取程序</button>
+                <button type="button" data-question="拿到 Zulassung 以后怎么完成 Immatrikulation？">录取后注册</button>
+              </div>
+              <button class="primary-button" type="submit">生成建议</button>
+            </form>
+
+            <article id="answerBox" class="answer-card empty">
+              <h3>还没有问题</h3>
+              <p>选择你的申请画像，然后输入问题。系统会给出简化版建议、下一步行动和官方链接。</p>
+            </article>
+          </section>
+
+          <aside class="panel side-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">下一步</p>
+                <h2>行动建议</h2>
+              </div>
+            </div>
+            <div id="actionList" class="action-list"></div>
+          </aside>
+        </section>
+
+        <section id="checklist" class="panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Documents</p>
+              <h2>个性化材料清单</h2>
+            </div>
+          </div>
+          <div id="checklistItems" class="checklist"></div>
+        </section>
+
+        <section id="timeline" class="panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Process</p>
+              <h2>申请流程地图</h2>
+            </div>
+          </div>
+          <div id="timelineItems" class="timeline"></div>
+        </section>
+
+        <section id="glossary" class="panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Glossary</p>
+              <h2>TUM 材料术语库</h2>
+            </div>
+          </div>
+          <div id="glossaryList" class="glossary-list"></div>
+        </section>
+
+        <section class="two-column">
+          <section class="panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">FAQ</p>
+                <h2>高频问题</h2>
+              </div>
+            </div>
+            <div id="faqList" class="faq-list"></div>
+          </section>
+
+          <section id="sources" class="panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Sources</p>
+                <h2>官方参考链接</h2>
+              </div>
+            </div>
+            <div id="sourceList" class="source-list"></div>
+          </section>
+        </section>
+      </section>
+    </main>
+
+    <script src="src/app.js"></script>
+  </body>
+</html>

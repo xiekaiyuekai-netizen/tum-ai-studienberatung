@@ -43,11 +43,11 @@ node scripts/local-server.js
 3. 点击 `Add New Project`
 4. 选择 `xiekaiyuekai-netizen/tum-ai-studienberatung`
 5. Framework Preset 选择 `Other`
-6. Build Command 使用 `node build.js`
+6. Build Command 留空
 7. Output Directory 使用 `public`
 8. 点击 `Deploy`
 
-这个项目是静态页面，不依赖后端 API。部署时会通过 `build.js` 把 `index.html` 和 `src/` 复制到 `public/`，Vercel 会托管 `public`。本地的开发服务器放在 `scripts/local-server.js`，不会作为 Vercel Serverless Function 运行。
+这个项目是静态页面，不依赖后端 API。仓库里提交了 `public/` 静态产物，Vercel 只需要托管 `public`。本地的开发服务器放在 `scripts/local-server.js`，不会作为 Vercel Serverless Function 运行。
 
 ## 功能
 
