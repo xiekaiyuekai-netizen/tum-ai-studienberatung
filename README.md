@@ -34,6 +34,21 @@ http://localhost:4273
 npm.cmd start
 ```
 
+## 在线部署
+
+推荐使用 Vercel：
+
+1. 打开 https://vercel.com
+2. 使用 GitHub 登录
+3. 点击 `Add New Project`
+4. 选择 `xiekaiyuekai-netizen/tum-ai-studienberatung`
+5. Framework Preset 选择 `Other`
+6. Build Command 留空
+7. Output Directory 留空
+8. 点击 `Deploy`
+
+这个项目是静态页面，不依赖后端 API。Vercel 会直接托管 `index.html`、`src/app.js` 和 `src/styles.css`。
+
 ## 功能
 
 - 申请画像选择：Bachelor / Master、学历来源、学历国家、授课语言、VPD 状态、目标学期
