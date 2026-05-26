@@ -4,6 +4,10 @@
 
 它不是官方工具，也不直接代表 TUM。项目里的内容基于 TUM 官网公开信息整理，最终要求必须以 TUM 官网、具体专业页面和 TUMonline 材料清单为准。
 
+在线 Demo：
+
+https://tum-ai-studienberatung-nez9.vercel.app
+
 ## 为什么比 RAG 项目更适合入门
 
 这个项目不用向量数据库、不用文档切片、不用复杂后端。核心是：
