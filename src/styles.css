@@ -254,6 +254,111 @@ textarea:focus {
   align-items: start;
 }
 
+.path-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.path-card {
+  min-height: 148px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  background: #fff;
+}
+
+.path-card span,
+.path-card strong {
+  display: block;
+}
+
+.path-card span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.path-card strong {
+  margin: 8px 0;
+  color: #172033;
+  font-size: 22px;
+  line-height: 1.1;
+}
+
+.path-card p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.path-card.blue {
+  border-color: #b9d7f2;
+  background: #f3f9ff;
+}
+
+.path-card.green {
+  border-color: #b9e1cd;
+  background: #f2fbf6;
+}
+
+.path-card.yellow {
+  border-color: #f0d398;
+  background: #fff9ea;
+}
+
+.path-card.red {
+  border-color: #edb4ad;
+  background: #fff6f4;
+}
+
+.risk-board {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.7fr);
+  gap: 16px;
+}
+
+.risk-board h3 {
+  margin-bottom: 10px;
+}
+
+.risk-list,
+.priority-sources,
+.source-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.risk-list article {
+  flex: 1 1 240px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  background: #fbfdff;
+}
+
+.risk-list strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.risk-list p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.priority-sources a,
+.source-tags a {
+  border-radius: 999px;
+  padding: 6px 9px;
+  background: var(--soft);
+  color: var(--tum-dark);
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
 .question-form {
   display: grid;
   gap: 12px;
@@ -375,6 +480,10 @@ textarea:focus {
   gap: 12px;
 }
 
+.check-item p {
+  margin-bottom: 10px;
+}
+
 .check-item > span {
   align-self: start;
   border-radius: 999px;
@@ -463,6 +572,8 @@ details p {
   .profile-grid,
   .advisor-grid,
   .two-column,
+  .path-summary,
+  .risk-board,
   .glossary-list {
     grid-template-columns: 1fr;
   }

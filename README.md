@@ -1,6 +1,6 @@
 # TUM AI 申请咨询助手
 
-这是一个相对简单的中文 Demo：面向准备申请 TUM 的学生，提供申请流程、材料清单、VPD、APS、语言证明和 TUMonline 常见问题答疑。
+这是一个中文 TUM 申请咨询 Demo：面向准备申请 TUM 的学生，提供申请路径判断、材料清单自查、VPD、APS、语言证明、高年级入学和 TUMonline 常见问题答疑。
 
 它不是官方工具，也不直接代表 TUM。项目里的内容基于 TUM 官网公开信息整理，最终要求必须以 TUM 官网、具体专业页面和 TUMonline 材料清单为准。
 
@@ -13,12 +13,12 @@ https://tum-ai-studienberatung-nez9.vercel.app
 这个项目不用向量数据库、不用文档切片、不用复杂后端。核心是：
 
 ```text
-申请画像 -> 规则匹配 -> 个性化材料清单 -> 问答建议 -> 官方链接
+申请画像 -> 申请路径判断 -> 风险提示 -> 个性化材料清单 -> 问答建议 -> 官方链接
 ```
 
 简历上可以写：
 
-> Built a Chinese applicant advising assistant for TUM prospective students, with profile-based checklists, rule-based Q&A, application timeline, VPD/APS guidance, and official-source linking.
+> Built a Chinese TUM applicant advising assistant with profile-based route selection, document checklist self-check, rule-based Q&A, VPD/APS guidance, higher-semester application support, official-source citations, and Vercel deployment.
 
 ## 本地运行
 
@@ -56,13 +56,18 @@ node scripts/local-server.js
 ## 功能
 
 - 申请画像选择：Bachelor / Master、学历来源、学历国家、授课语言、VPD 状态、目标学期
+- 申请路径总览：TUMonline、VPD、特殊流程和准备度摘要
+- 重点风险提示：VPD、APS、高年级入学、语言证明等风险自动识别
 - 中文申请问答助手
 - 常见问题快捷提问
 - 个性化材料清单
+- 每个材料项附带相关 TUM 官方来源入口
 - TUM 官方 Dokumentenglossar 术语库摘要
 - 更高 Fachsemester 申请提醒
 - 申请准备度估算
 - 申请流程地图
+- 复制申请计划：把当前申请画像、下一步和风险点复制成文字
+- 本地保存申请画像：刷新页面后保留上次选择
 - VPD / uni-assist 提醒
 - APS 提醒
 - 语言证明提醒

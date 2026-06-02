@@ -193,6 +193,8 @@ const selectors = {
   semester: document.querySelector("#semesterSelect")
 };
 
+const storageKey = "tum-advisor-profile";
+
 const elements = {
   navItems: document.querySelectorAll(".nav-item"),
   questionForm: document.querySelector("#questionForm"),
@@ -200,6 +202,9 @@ const elements = {
   quickQuestions: document.querySelectorAll("[data-question]"),
   answerBox: document.querySelector("#answerBox"),
   actionList: document.querySelector("#actionList"),
+  pathSummary: document.querySelector("#pathSummary"),
+  riskList: document.querySelector("#riskList"),
+  prioritySources: document.querySelector("#prioritySources"),
   checklistItems: document.querySelector("#checklistItems"),
   timelineItems: document.querySelector("#timelineItems"),
   glossaryList: document.querySelector("#glossaryList"),
@@ -207,13 +212,21 @@ const elements = {
   sourceList: document.querySelector("#sourceList"),
   readinessBadge: document.querySelector("#readinessBadge"),
   intentBadge: document.querySelector("#intentBadge"),
+  copyPlanBtn: document.querySelector("#copyPlanBtn"),
   resetBtn: document.querySelector("#resetBtn")
 };
 
 init();
 
 function init() {
-  Object.values(selectors).forEach((select) => select.addEventListener("change", render));
+  restoreProfile();
+
+  Object.values(selectors).forEach((select) =>
+    select.addEventListener("change", () => {
+      saveProfile();
+      render();
+    })
+  );
 
   elements.navItems.forEach((button) => {
     button.addEventListener("click", () => {
@@ -250,8 +263,11 @@ function init() {
     elements.answerBox.innerHTML = "<h3>还没有问题</h3><p>选择你的申请画像，然后输入问题。系统会给出简化版建议、下一步行动和官方链接。</p>";
     elements.intentBadge.textContent = "等待提问";
     elements.intentBadge.className = "badge muted";
+    saveProfile();
     render();
   });
+
+  elements.copyPlanBtn.addEventListener("click", copyApplicationPlan);
 
   render();
 }
@@ -275,6 +291,9 @@ function render() {
   const readiness = Math.round((completed / checklist.length) * 100);
 
   elements.readinessBadge.textContent = `准备度 ${readiness}%`;
+  elements.pathSummary.innerHTML = buildPathSummary(profile, readiness).map(renderPathCard).join("");
+  elements.riskList.innerHTML = buildRiskList(profile).map(renderRiskItem).join("");
+  elements.prioritySources.innerHTML = buildPrioritySources(profile).map((key) => renderSourceLink(getSource(key))).join("");
   elements.checklistItems.innerHTML = checklist.map(renderChecklistItem).join("");
   elements.timelineItems.innerHTML = buildTimeline(profile).map(renderTimelineItem).join("");
   elements.glossaryList.innerHTML = documentGlossary.map(renderGlossaryItem).join("");
@@ -288,27 +307,32 @@ function buildChecklist(profile) {
     {
       title: profile.degree === "master" ? "Bachelor 学位文件或当前成绩单" : "大学入学资格证明",
       detail: profile.degree === "master" ? "Master 申请通常需要学位证书；尚未毕业时，部分项目可先提交当前 Transcript。" : "Bachelor 申请通常需要 Hochschulzugangsberechtigung，即大学入学资格证明。",
-      status: "todo"
+      status: "todo",
+      sources: ["glossary", "online"]
     },
     {
       title: "TUMonline 专业申请",
       detail: "必须在 TUMonline 申请具体专业；uni-assist 的 VPD 不等于申请 TUM。",
-      status: "todo"
+      status: "todo",
+      sources: ["online", "vpd"]
     },
     {
       title: "语言证明",
       detail: languageDetail(profile.language),
-      status: profile.language === "mixed" ? "warning" : "todo"
+      status: profile.language === "mixed" ? "warning" : "todo",
+      sources: ["language"]
     },
     {
       title: "身份文件",
       detail: "上传有效身份证件或护照。按 TUM Dokumentenglossar，部分非必要号码信息可以遮盖。",
-      status: "todo"
+      status: "todo",
+      sources: ["glossary", "documents"]
     },
     {
       title: "Authentic documents",
       detail: "文件应有官方签名和印章，或数字签章、验证码、二维码等在线验证信息；非德语/英语文件通常需要宣誓翻译。",
-      status: "todo"
+      status: "todo",
+      sources: ["documents"]
     }
   ];
 
@@ -317,12 +341,14 @@ function buildChecklist(profile) {
       {
         title: "Credit transfer report / Semestereinstufung",
         detail: "申请更高 Fachsemester 必须关注 credit transfer report 或 Semestereinstufung；没有它不能注册进入更高 Fachsemester。",
-        status: "todo"
+        status: "todo",
+        sources: ["higherSemester", "glossary"]
       },
       {
         title: "Modulbeschreibungen",
         detail: "提交希望被认可课程的模块描述，说明内容、学分、学习成果和考试形式。",
-        status: "todo"
+        status: "todo",
+        sources: ["higherSemester", "glossary"]
       }
     );
 
@@ -330,7 +356,8 @@ function buildChecklist(profile) {
       items.unshift({
         title: "Notenskala",
         detail: "如果已有成绩来自德国以外，申请更高 Fachsemester 时通常要提供评分体系说明。",
-        status: "todo"
+        status: "todo",
+        sources: ["glossary", "higherSemester"]
       });
     }
   }
@@ -339,7 +366,8 @@ function buildChecklist(profile) {
     items.unshift({
       title: "VPD / uni-assist",
       detail: vpdDetail(profile),
-      status: profile.vpd === "received" ? "ready" : profile.vpd === "submitted" ? "warning" : "todo"
+      status: profile.vpd === "received" ? "ready" : profile.vpd === "submitted" ? "warning" : "todo",
+      sources: ["vpd"]
     });
   }
 
@@ -347,7 +375,8 @@ function buildChecklist(profile) {
     items.unshift({
       title: "APS 证书",
       detail: "中国、印度、越南学历背景申请德国高校时，通常需要关注 APS；博士申请除外，另有个别例外。",
-      status: "todo"
+      status: "todo",
+      sources: ["aps"]
     });
   }
 
@@ -355,11 +384,94 @@ function buildChecklist(profile) {
     items.push({
       title: "项目特定材料",
       detail: "很多 Master 项目会要求动机信、essay、课程描述、专业背景表或 aptitude assessment 相关材料，具体看项目页面。",
-      status: "warning"
+      status: "warning",
+      sources: ["admission", "online"]
     });
   }
 
   return items;
+}
+
+function buildPathSummary(profile, readiness) {
+  return [
+    {
+      label: "申请入口",
+      value: "TUMonline",
+      text: "申请具体 TUM 专业必须通过 TUMonline 完成，VPD 只是学历预审。",
+      tone: "blue"
+    },
+    {
+      label: "学历预审",
+      value: profile.qualification === "outside-germany" ? "VPD 需确认" : "德国学历路径",
+      text: profile.qualification === "outside-germany" ? vpdDetail(profile) : "德国学历通常按 TUMonline 和项目清单提交。",
+      tone: profile.qualification === "outside-germany" && profile.vpd !== "received" ? "yellow" : "green"
+    },
+    {
+      label: "特殊流程",
+      value: profile.applicationType === "higher-semester" ? "更高 Fachsemester" : "第一学期",
+      text:
+        profile.applicationType === "higher-semester"
+          ? "需要先联系 Studienfachberatung，并准备学期认定或学分转换材料。"
+          : "按目标项目第一学期申请流程准备材料。",
+      tone: profile.applicationType === "higher-semester" ? "yellow" : "green"
+    },
+    {
+      label: "准备度",
+      value: `${readiness}%`,
+      text: readiness >= 50 ? "已有部分关键路径完成或确认。" : "还有多个关键文件和截止节点需要确认。",
+      tone: readiness >= 50 ? "green" : "red"
+    }
+  ];
+}
+
+function buildRiskList(profile) {
+  const risks = [];
+
+  if (profile.qualification === "outside-germany" && profile.vpd === "not-started") {
+    risks.push({
+      title: "VPD 尚未开始",
+      text: "如果目标项目要求 VPD，uni-assist 预审和 TUMonline 申请是两个不同步骤，要预留时间。"
+    });
+  }
+
+  if (["china", "india", "vietnam"].includes(profile.country) && profile.qualification === "outside-germany") {
+    risks.push({
+      title: "APS 可能是前置材料",
+      text: "中国、印度、越南学历申请德国高校通常涉及 APS，建议尽早确认例外情况和办理周期。"
+    });
+  }
+
+  if (profile.applicationType === "higher-semester") {
+    risks.push({
+      title: "高年级申请不是普通转学",
+      text: "TUM 明确要求先确认 Studienfachberatung 和 credit transfer / Semestereinstufung 路径。"
+    });
+  }
+
+  if (profile.language === "mixed") {
+    risks.push({
+      title: "语言要求可能叠加",
+      text: "英德混合项目可能同时要求英语和德语证明，必须看目标项目页面。"
+    });
+  }
+
+  if (!risks.length) {
+    risks.push({
+      title: "主要风险较低",
+      text: "仍需以目标项目页面和 TUMonline 清单为准，尤其是 deadline 和项目特定文件。"
+    });
+  }
+
+  return risks;
+}
+
+function buildPrioritySources(profile) {
+  const keys = new Set(["online", "documents", "dates"]);
+  if (profile.qualification === "outside-germany") keys.add("vpd");
+  if (["china", "india", "vietnam"].includes(profile.country)) keys.add("aps");
+  if (profile.applicationType === "higher-semester") keys.add("higherSemester");
+  keys.add("language");
+  return Array.from(keys);
 }
 
 function buildTimeline(profile) {
@@ -526,7 +638,29 @@ function renderChecklistItem(item) {
       <div>
         <h3>${escapeHtml(item.title)}</h3>
         <p>${escapeHtml(item.detail)}</p>
+        <div class="source-tags">
+          ${(item.sources || []).map((key) => renderSourceLink(getSource(key))).join("")}
+        </div>
       </div>
+    </article>
+  `;
+}
+
+function renderPathCard(item) {
+  return `
+    <article class="path-card ${item.tone}">
+      <span>${escapeHtml(item.label)}</span>
+      <strong>${escapeHtml(item.value)}</strong>
+      <p>${escapeHtml(item.text)}</p>
+    </article>
+  `;
+}
+
+function renderRiskItem(item) {
+  return `
+    <article>
+      <strong>${escapeHtml(item.title)}</strong>
+      <p>${escapeHtml(item.text)}</p>
     </article>
   `;
 }
@@ -619,4 +753,52 @@ function escapeHtml(value) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+}
+
+function saveProfile() {
+  localStorage.setItem(storageKey, JSON.stringify(getProfile()));
+}
+
+function restoreProfile() {
+  try {
+    const profile = JSON.parse(localStorage.getItem(storageKey) || "{}");
+    Object.entries(profile).forEach(([key, value]) => {
+      if (selectors[key] && value) selectors[key].value = value;
+    });
+  } catch {
+    localStorage.removeItem(storageKey);
+  }
+}
+
+async function copyApplicationPlan() {
+  const profile = getProfile();
+  const actions = buildActions(profile);
+  const risks = buildRiskList(profile);
+  const lines = [
+    "TUM 申请计划",
+    `- 学位阶段：${profile.degree === "master" ? "Master" : "Bachelor"}`,
+    `- 申请类型：${profile.applicationType === "higher-semester" ? "更高 Fachsemester" : "第一学期入学"}`,
+    `- 学历来源：${profile.qualification === "outside-germany" ? "德国以外" : "德国"}`,
+    `- 国家/地区：${countryName(profile.country)}`,
+    `- 授课语言：${languageName(profile.language)}`,
+    "",
+    "下一步：",
+    ...actions.map((item) => `- ${item}`),
+    "",
+    "重点风险：",
+    ...risks.map((item) => `- ${item.title}：${item.text}`)
+  ];
+
+  try {
+    await navigator.clipboard.writeText(lines.join("\n"));
+    elements.copyPlanBtn.textContent = "已复制";
+    setTimeout(() => {
+      elements.copyPlanBtn.textContent = "复制申请计划";
+    }, 1400);
+  } catch {
+    elements.copyPlanBtn.textContent = "复制失败";
+    setTimeout(() => {
+      elements.copyPlanBtn.textContent = "复制申请计划";
+    }, 1400);
+  }
 }
