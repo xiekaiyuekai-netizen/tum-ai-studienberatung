@@ -1,6 +1,8 @@
 # TUM AI 申请咨询助手
 
-这是一个中文 TUM 申请咨询 Demo：面向准备申请 TUM 的学生，提供申请路径判断、材料清单自查、VPD、APS、语言证明、高年级入学和 TUMonline 常见问题答疑。
+这是一个中文 TUM 申请咨询 Demo：把申请咨询做成类似 ChatGPT 的 Project 工作区。申请者先为目标专业新建 Project，填写专业、学位阶段、申请类型、学历背景、授课语言、VPD 状态等信息，然后在该 Project 内进行连续问答。
+
+如果申请不同专业，用户应创建不同 Project。每个 Project 会保存独立的专业信息和聊天记录，避免不同专业的材料要求、截止日期和申请流程混在一起。
 
 它不是官方工具，也不直接代表 TUM。项目里的内容基于 TUM 官网公开信息整理，最终要求必须以 TUM 官网、具体专业页面和 TUMonline 材料清单为准。
 
@@ -13,12 +15,12 @@ https://tum-ai-studienberatung-nez9.vercel.app
 这个项目不用向量数据库、不用文档切片、不用复杂后端。核心是：
 
 ```text
-申请画像 -> 申请路径判断 -> 风险提示 -> 个性化材料清单 -> 问答建议 -> 官方链接
+新建 Project -> 填写专业信息 -> 基于 Project 背景提问 -> 生成建议 -> 官方来源链接
 ```
 
 简历上可以写：
 
-> Built a Chinese TUM applicant advising assistant with profile-based route selection, document checklist self-check, rule-based Q&A, VPD/APS guidance, higher-semester application support, official-source citations, and Vercel deployment.
+> Built a ChatGPT-style Chinese TUM application advising assistant with project-based application profiles, independent chat histories for different programs, rule-based Q&A, VPD/APS and higher-semester guidance, official-source links, and Vercel deployment.
 
 ## 本地运行
 
@@ -55,19 +57,15 @@ node scripts/local-server.js
 
 ## 功能
 
-- 申请画像选择：Bachelor / Master、学历来源、学历国家、授课语言、VPD 状态、目标学期
-- 申请路径总览：TUMonline、VPD、特殊流程和准备度摘要
-- 重点风险提示：VPD、APS、高年级入学、语言证明等风险自动识别
-- 中文申请问答助手
+- ChatGPT 风格单窗口对话界面
+- Project 管理：不同申请专业使用不同 Project
+- 每个 Project 独立保存专业信息和聊天记录
+- Project 信息包含：Bachelor / Master、专业名称、申请类型、学历来源、国家/地区、授课语言、VPD 状态、目标学期、deadline 和备注
+- 基于当前 Project 背景回答 VPD、APS、语言证明、材料格式、高年级入学、录取程序和 Immatrikulation 问题
+- 回答附带建议下一步
+- 回答附带 TUM 官方来源链接
 - 常见问题快捷提问
-- 个性化材料清单
-- 每个材料项附带相关 TUM 官方来源入口
-- TUM 官方 Dokumentenglossar 术语库摘要
-- 更高 Fachsemester 申请提醒
-- 申请准备度估算
-- 申请流程地图
-- 复制申请计划：把当前申请画像、下一步和风险点复制成文字
-- 本地保存申请画像：刷新页面后保留上次选择
+- 零依赖静态项目，浏览器 localStorage 保存数据
 - VPD / uni-assist 提醒
 - APS 提醒
 - 语言证明提醒
