@@ -575,7 +575,7 @@ function renderMessage(message) {
         <div class="message-content ${message.isLoading ? "loading-text" : ""}">${escapeHtml(message.text)}</div>
         ${message.actions?.length ? renderActions(message.actions) : ""}
         ${message.sourceKeys?.length ? renderSources(message.sourceKeys) : ""}
-        ${message.model ? `<div class="model-note">AI: ${escapeHtml(message.model)}</div>` : ""}
+        ${message.model ? '<div class="model-note">AI: TUM 申请助手</div>' : ""}
       </div>
     </article>
   `;
