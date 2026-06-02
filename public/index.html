@@ -10,17 +10,17 @@
     <header class="app-header">
       <div class="header-brand">
         <div class="header-logo">TUM</div>
-        <div class="app-title">TUM GPT 申请咨询助手</div>
+        <div class="app-title" data-i18n="appTitle">TUM GPT 申请咨询助手</div>
       </div>
       <nav class="header-actions" aria-label="辅助导航">
-        <button type="button">使用指南</button>
-        <button type="button">中文</button>
+        <button id="guideButton" type="button" data-i18n="guideButton">使用指南</button>
+        <button id="languageToggle" type="button">中文</button>
       </nav>
     </header>
 
     <main class="app-shell">
       <aside class="sidebar">
-        <button id="newProjectBtn" class="new-project-button" type="button">+ 新建申请 Project</button>
+        <button id="newProjectBtn" class="new-project-button" type="button" data-i18n="newProject">+ 新建申请 Project</button>
 
         <section class="project-section">
           <div class="sidebar-section-title">Projects</div>
@@ -28,22 +28,22 @@
         </section>
 
         <div class="sidebar-note">
-          <strong>非官方 Demo</strong>
-          <p>免责声明：回答基于 TUM 官网公开信息整理，最终以具体专业页面、TUMonline 和 TUM 官网为准。</p>
+          <strong data-i18n="demoTitle">非官方 Demo</strong>
+          <p data-i18n="disclaimerShort">免责声明：回答基于 TUM 官网公开信息整理，最终以具体专业页面、TUMonline 和 TUM 官网为准。</p>
         </div>
       </aside>
 
       <section class="chat-main">
         <div id="emptyState" class="empty-state">
           <div class="empty-inner">
-            <h1 class="main-title">TUM 申请版 ChatGPT</h1>
+            <h1 class="main-title" data-i18n="mainTitle">TUM 申请版 ChatGPT</h1>
             <div class="info-box">
-              <div class="info-box-title">请先创建一个申请 Project</div>
+              <div class="info-box-title" data-i18n="emptyTitle">请先创建一个申请 Project</div>
               <p class="info-box-text">
                 每个 Project 保存独立的专业信息和聊天记录。申请不同专业时，新建不同 Project，避免材料要求和流程混在一起。
               </p>
             </div>
-            <button id="emptyCreateBtn" class="primary-button" type="button">创建第一个 Project</button>
+            <button id="emptyCreateBtn" class="primary-button" type="button" data-i18n="createFirst">创建第一个 Project</button>
           </div>
         </div>
 
@@ -53,13 +53,13 @@
               <p id="projectMeta" class="project-meta"></p>
               <h1 id="projectTitle" class="main-title"></h1>
             </div>
-            <button id="editProjectBtn" class="secondary-button compact-button" type="button">编辑信息</button>
+            <button id="editProjectBtn" class="secondary-button compact-button" type="button" data-i18n="editInfo">编辑信息</button>
           </header>
 
           <div id="messageList" class="message-list" aria-live="polite"></div>
 
           <div class="keyword-row" aria-label="推荐关键词">
-            <span class="keyword-label">关键词</span>
+            <span class="keyword-label" data-i18n="keywordLabel">关键词</span>
             <button class="keyword-chip active" type="button" data-question="我这个专业申请需要先做 VPD 还是先提交 TUMonline？">申请顺序</button>
             <button class="keyword-chip" type="button" data-question="我需要 APS 吗？">APS</button>
             <button class="keyword-chip" type="button" data-question="语言证明什么时候必须上传？">语言证明</button>
@@ -70,8 +70,8 @@
           <form id="chatForm" class="composer">
             <textarea id="chatInput" rows="2" placeholder="问这个 Project 的申请问题，例如：这个专业需要 VPD 吗？"></textarea>
             <div class="input-footer">
-              <span class="char-count">基于当前 Project 和 TUM 官方资料回答</span>
-              <button class="send-button" type="submit">发送</button>
+              <span class="char-count" data-i18n="composerNote">基于当前 Project 和 TUM 官方资料回答</span>
+              <button class="send-button" type="submit" data-i18n="send">发送</button>
             </div>
           </form>
         </section>
@@ -187,12 +187,64 @@
           </div>
 
           <div class="project-panel-footer">
-            <button class="secondary-button" id="cancelProjectBtn" type="button">取消</button>
-            <button class="primary-button" type="submit">保存 Project</button>
+            <button class="secondary-button" id="cancelProjectBtn" type="button" data-i18n="cancel">取消</button>
+            <button class="primary-button" type="submit" data-i18n="saveProject">保存 Project</button>
           </div>
         </form>
       </aside>
     </main>
+
+    <dialog id="guideDialog" class="guide-dialog">
+      <div class="guide-content">
+        <header class="guide-header">
+          <div>
+            <p class="section-label" data-i18n="guideEyebrow">Guide</p>
+            <h2 data-i18n="guideTitle">使用指南</h2>
+          </div>
+          <button id="closeGuideButton" class="panel-close-button" type="button" aria-label="关闭使用指南">×</button>
+        </header>
+
+        <section class="guide-body" data-language="zh">
+          <h3>如何使用这个网站</h3>
+          <ol>
+            <li>先点击左侧“新建申请 Project”，为一个目标专业建立独立申请档案。</li>
+            <li>在 Project 表单里填写申请专业、学位阶段、申请类型、学历来源、国家/地区、VPD 状态和目标学期。</li>
+            <li>如果申请多个专业，请为每个专业单独创建 Project，避免不同专业的材料要求混在一起。</li>
+            <li>在下方输入框提问，系统会结合当前 Project 信息和 TUM 官方资料摘要生成回答。</li>
+            <li>可以使用输入框上方的关键词按钮快速填入常见问题。</li>
+            <li>需要修改 Project 信息时，点击左侧 Project 卡片里的“编辑”。</li>
+          </ol>
+
+          <div class="guide-disclaimer">
+            <strong>免责声明</strong>
+            <p>
+              本工具是非官方 Demo，不代表 Technical University of Munich。回答基于公开资料和 AI 生成结果，仅用于申请准备参考。
+              最终要求必须以 TUM 官网、具体专业页面、TUMonline 材料清单和学校邮件通知为准。
+            </p>
+          </div>
+        </section>
+
+        <section class="guide-body" data-language="en" hidden>
+          <h3>How to use this website</h3>
+          <ol>
+            <li>Click “New Application Project” on the left to create a separate profile for one target program.</li>
+            <li>Fill in the program, degree level, application type, educational background, country/region, VPD status and target semester.</li>
+            <li>Create a separate Project for each program so that document requirements and deadlines do not get mixed.</li>
+            <li>Ask questions in the chat box. The assistant uses the current Project context and TUM official guidance summaries.</li>
+            <li>Use the keyword buttons above the input box to insert common application questions quickly.</li>
+            <li>To update Project information, click “Edit” inside the Project card on the left.</li>
+          </ol>
+
+          <div class="guide-disclaimer">
+            <strong>Disclaimer</strong>
+            <p>
+              This is an unofficial demo and is not affiliated with Technical University of Munich. Answers are generated from public information and AI output for preparation purposes only.
+              Final requirements must always be checked against the TUM website, the specific degree program page, TUMonline document checklist and official university emails.
+            </p>
+          </div>
+        </section>
+      </div>
+    </dialog>
 
     <script src="src/app.js"></script>
   </body>

@@ -643,6 +643,84 @@ button {
   background: var(--tum-blue-light);
 }
 
+.guide-dialog {
+  width: min(720px, calc(100% - 32px));
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  padding: 0;
+  background: #ffffff;
+}
+
+.guide-dialog::backdrop {
+  background: rgba(31, 41, 55, 0.36);
+}
+
+.guide-content {
+  max-height: min(720px, calc(100vh - 48px));
+  overflow: hidden;
+}
+
+.guide-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 56px;
+  border-bottom: 1px solid var(--border-default);
+  padding: 0 18px;
+}
+
+.guide-header h2 {
+  margin: 0;
+  color: var(--tum-blue-dark);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.guide-body {
+  overflow-y: auto;
+  max-height: calc(100vh - 132px);
+  padding: 16px 20px 18px;
+}
+
+.guide-body h3 {
+  margin: 0 0 10px;
+  color: var(--tum-blue-dark);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.guide-body ol {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.guide-body li {
+  margin: 7px 0;
+  line-height: 1.55;
+}
+
+.guide-disclaimer {
+  margin-top: 16px;
+  border: 1px solid var(--border-blue);
+  border-radius: 6px;
+  padding: 12px 14px;
+  background: var(--bg-subtle);
+}
+
+.guide-disclaimer strong {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--tum-blue-dark);
+  font-weight: 600;
+}
+
+.guide-disclaimer p {
+  margin: 0;
+  color: #374151;
+  line-height: 1.55;
+}
+
 .form-body {
   min-height: 0;
   overflow-y: auto;

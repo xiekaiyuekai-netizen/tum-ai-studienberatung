@@ -101,10 +101,59 @@ const tumPrograms = [
 
 const storageKey = "tum-gpt-projects-v1";
 const activeKey = "tum-gpt-active-project-v1";
+const languageKey = "tum-gpt-language-v1";
 
 let projects = loadProjects();
 let activeProjectId = localStorage.getItem(activeKey) || projects[0]?.id || null;
 let editingProjectId = null;
+let currentLanguage = localStorage.getItem(languageKey) || "zh";
+
+const translations = {
+  zh: {
+    appTitle: "TUM GPT 申请咨询助手",
+    guideButton: "使用指南",
+    languageToggle: "中文",
+    newProject: "+ 新建申请 Project",
+    demoTitle: "非官方 Demo",
+    disclaimerShort: "免责声明：回答基于 TUM 官网公开信息整理，最终以具体专业页面、TUMonline 和 TUM 官网为准。",
+    mainTitle: "TUM 申请版 ChatGPT",
+    emptyTitle: "请先创建一个申请 Project",
+    createFirst: "创建第一个 Project",
+    editInfo: "编辑信息",
+    keywordLabel: "关键词",
+    composerNote: "基于当前 Project 和 TUM 官方资料回答",
+    send: "发送",
+    cancel: "取消",
+    saveProject: "保存 Project",
+    guideEyebrow: "Guide",
+    guideTitle: "使用指南",
+    editProject: "编辑申请 Project",
+    newProjectTitle: "新建申请 Project",
+    editProjectButton: "编辑"
+  },
+  en: {
+    appTitle: "TUM GPT Application Advisor",
+    guideButton: "Guide",
+    languageToggle: "EN",
+    newProject: "+ New Application Project",
+    demoTitle: "Unofficial Demo",
+    disclaimerShort: "Disclaimer: Answers are based on public TUM information. The final source of truth is the program page, TUMonline and official TUM guidance.",
+    mainTitle: "TUM Application ChatGPT",
+    emptyTitle: "Create an application Project first",
+    createFirst: "Create First Project",
+    editInfo: "Edit Info",
+    keywordLabel: "Keywords",
+    composerNote: "Answers use the current Project and TUM official guidance",
+    send: "Send",
+    cancel: "Cancel",
+    saveProject: "Save Project",
+    guideEyebrow: "Guide",
+    guideTitle: "Guide",
+    editProject: "Edit Application Project",
+    newProjectTitle: "New Application Project",
+    editProjectButton: "Edit"
+  }
+};
 
 const elements = {
   appShell: document.querySelector(".app-shell"),
@@ -121,6 +170,10 @@ const elements = {
   chatForm: document.querySelector("#chatForm"),
   chatInput: document.querySelector("#chatInput"),
   sendButton: document.querySelector(".send-button"),
+  guideButton: document.querySelector("#guideButton"),
+  guideDialog: document.querySelector("#guideDialog"),
+  closeGuideButton: document.querySelector("#closeGuideButton"),
+  languageToggle: document.querySelector("#languageToggle"),
   projectDialog: document.querySelector("#projectDialog"),
   projectForm: document.querySelector("#projectForm"),
   dialogTitle: document.querySelector("#dialogTitle"),
@@ -149,6 +202,9 @@ function init() {
   elements.newProjectBtn.addEventListener("click", () => openProjectDialog());
   elements.emptyCreateBtn.addEventListener("click", () => openProjectDialog());
   elements.editProjectBtn.addEventListener("click", () => openProjectDialog(getActiveProject()));
+  elements.guideButton.addEventListener("click", openGuideDialog);
+  elements.closeGuideButton.addEventListener("click", closeGuideDialog);
+  elements.languageToggle.addEventListener("click", toggleLanguage);
   elements.closeDialogBtn.addEventListener("click", closeProjectDialog);
   elements.cancelProjectBtn.addEventListener("click", closeProjectDialog);
   elements.projectForm.addEventListener("submit", saveProjectFromDialog);
@@ -168,7 +224,39 @@ function init() {
   });
 
   renderProgramOptions();
+  applyLanguage();
   render();
+}
+
+function openGuideDialog() {
+  elements.guideDialog.showModal();
+}
+
+function closeGuideDialog() {
+  elements.guideDialog.close();
+}
+
+function toggleLanguage() {
+  currentLanguage = currentLanguage === "zh" ? "en" : "zh";
+  localStorage.setItem(languageKey, currentLanguage);
+  applyLanguage();
+  renderProjectList();
+  syncProjectPanel(editingProjectId ? projects.find((project) => project.id === editingProjectId) : null);
+}
+
+function applyLanguage() {
+  const dict = translations[currentLanguage];
+  document.documentElement.lang = currentLanguage === "zh" ? "zh-CN" : "en";
+
+  document.querySelectorAll("[data-i18n]").forEach((node) => {
+    const key = node.dataset.i18n;
+    if (dict[key]) node.textContent = dict[key];
+  });
+
+  elements.languageToggle.textContent = dict.languageToggle;
+  document.querySelectorAll("[data-language]").forEach((node) => {
+    node.hidden = node.dataset.language !== currentLanguage;
+  });
 }
 
 function loadProjects() {
@@ -220,7 +308,7 @@ function renderProjectList() {
             <span>${escapeHtml(project.name)}</span>
             <small>${escapeHtml(project.programName)}</small>
           </button>
-          <button class="project-edit-button" type="button" data-edit-project-id="${project.id}" aria-label="编辑 ${escapeHtml(project.name)}">编辑</button>
+          <button class="project-edit-button" type="button" data-edit-project-id="${project.id}" aria-label="编辑 ${escapeHtml(project.name)}">${escapeHtml(translations[currentLanguage].editProjectButton)}</button>
           <button class="project-delete-button" type="button" data-delete-project-id="${project.id}" aria-label="删除 ${escapeHtml(project.name)}"></button>
         </article>
       `;
@@ -258,7 +346,7 @@ function openProjectDialog(project = null) {
 
 function syncProjectPanel(project = null) {
   editingProjectId = project?.id || null;
-  elements.dialogTitle.textContent = project ? "编辑申请 Project" : "新建申请 Project";
+  elements.dialogTitle.textContent = project ? translations[currentLanguage].editProject : translations[currentLanguage].newProjectTitle;
 
   fields.projectName.value = project?.name || "";
   fields.programName.value = project?.programName || "";
