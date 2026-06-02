@@ -159,17 +159,28 @@ button {
 
 .project-item {
   display: grid;
-  gap: 4px;
-  width: 100%;
+  grid-template-columns: minmax(0, 1fr) 30px;
+  align-items: center;
+  gap: 8px;
   border: 1px solid transparent;
-  padding: 11px 12px;
+  border-radius: 8px;
+  padding: 8px;
+  background: transparent;
+}
+
+.project-select-button {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  border: 0;
+  padding: 3px 4px;
   background: transparent;
   color: #172033;
   text-align: left;
 }
 
-.project-item span,
-.project-item small {
+.project-select-button span,
+.project-select-button small {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -178,6 +189,47 @@ button {
 .project-item:hover,
 .project-item.active {
   border-color: var(--line);
+  background: #fff;
+}
+
+.project-delete-button {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  border: 1px solid #f1b5ae;
+  border-radius: 999px;
+  background: #fff7f6;
+  opacity: 0.78;
+}
+
+.project-delete-button:hover {
+  border-color: var(--danger);
+  background: var(--danger);
+  opacity: 1;
+}
+
+.project-delete-button::before,
+.project-delete-button::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 11px;
+  width: 10px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--danger);
+}
+
+.project-delete-button::before {
+  transform: rotate(45deg);
+}
+
+.project-delete-button::after {
+  transform: rotate(-45deg);
+}
+
+.project-delete-button:hover::before,
+.project-delete-button:hover::after {
   background: #fff;
 }
 

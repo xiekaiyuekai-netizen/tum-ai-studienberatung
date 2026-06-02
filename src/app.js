@@ -56,6 +56,49 @@ const sources = [
   }
 ];
 
+const tumPrograms = [
+  { name: "Electrical Engineering and Information Technology - Bachelor of Science (B.Sc.)", degree: "bachelor", language: "german" },
+  { name: "Electrical Engineering and Information Technology - Master of Science (M.Sc.)", degree: "master", language: "german" },
+  { name: "Informatics - Bachelor of Science (B.Sc.)", degree: "bachelor", language: "german" },
+  { name: "Informatics - Master of Science (M.Sc.)", degree: "master", language: "english" },
+  { name: "Information Engineering - Bachelor of Science (B.Sc.)", degree: "bachelor", language: "english" },
+  { name: "Information Engineering - Master of Science (M.Sc.)", degree: "master", language: "english" },
+  { name: "Information Systems - Bachelor of Science (B.Sc.)", degree: "bachelor", language: "german" },
+  { name: "Data Engineering and Analytics - Master of Science (M.Sc.)", degree: "master", language: "english" },
+  { name: "Robotics, Cognition, Intelligence - Master of Science (M.Sc.)", degree: "master", language: "mixed" },
+  { name: "Mechatronics, Robotics and Biomechanical Engineering - Master of Science (M.Sc.)", degree: "master", language: "mixed" },
+  { name: "Management and Technology - Bachelor of Science (B.Sc.)", degree: "bachelor", language: "english" },
+  { name: "Management and Technology - Master of Science (M.Sc.)", degree: "master", language: "english" },
+  { name: "Management and Digital Technology - Master of Science (M.Sc.)", degree: "master", language: "english" },
+  { name: "Aerospace - Bachelor of Science (B.Sc.)", degree: "bachelor", language: "german" },
+  { name: "Aerospace - Master of Science (M.Sc.)", degree: "master", language: "english" },
+  { name: "Aerospace Engineering - Master of Science (M.Sc.)", degree: "master", language: "english" },
+  { name: "Mechanical Engineering - Bachelor of Science (B.Sc.)", degree: "bachelor", language: "german" },
+  { name: "Mechanical Engineering - Master of Science (M.Sc.)", degree: "master", language: "german" },
+  { name: "Automotive Engineering - Master of Science (M.Sc.)", degree: "master", language: "german" },
+  { name: "Energy and Process Engineering - Master of Science (M.Sc.)", degree: "master", language: "german" },
+  { name: "Civil Engineering - Bachelor of Science (B.Sc.)", degree: "bachelor", language: "german" },
+  { name: "Civil Engineering - Master of Science (M.Sc.)", degree: "master", language: "german" },
+  { name: "Environmental Engineering - Bachelor of Science (B.Sc.)", degree: "bachelor", language: "german" },
+  { name: "Environmental Engineering - Master of Science (M.Sc.)", degree: "master", language: "english" },
+  { name: "Architecture - Bachelor of Arts (B.A.)", degree: "bachelor", language: "german" },
+  { name: "Architecture - Master of Arts (M.A.)", degree: "master", language: "german" },
+  { name: "Computational Mechanics - Master of Science (M.Sc.)", degree: "master", language: "english" },
+  { name: "Transportation Systems - Master of Science (M.Sc.)", degree: "master", language: "english" },
+  { name: "Logistics Engineering and Management - Master of Science (M.Sc.)", degree: "master", language: "english" },
+  { name: "Biomedical Engineering and Medical Physics - Master of Science (M.Sc.)", degree: "master", language: "english" },
+  { name: "Mathematics - Bachelor of Science (B.Sc.)", degree: "bachelor", language: "german" },
+  { name: "Mathematics - Master of Science (M.Sc.)", degree: "master", language: "english" },
+  { name: "Physics - Bachelor of Science (B.Sc.)", degree: "bachelor", language: "german" },
+  { name: "Physics - Master of Science (M.Sc.)", degree: "master", language: "english" },
+  { name: "Chemistry - Bachelor of Science (B.Sc.)", degree: "bachelor", language: "german" },
+  { name: "Chemistry - Master of Science (M.Sc.)", degree: "master", language: "english" },
+  { name: "Biology - Bachelor of Science (B.Sc.)", degree: "bachelor", language: "german" },
+  { name: "Biology - Master of Science (M.Sc.)", degree: "master", language: "english" },
+  { name: "Sustainable Resource Management - Master of Science (M.Sc.)", degree: "master", language: "english" },
+  { name: "Politics and Technology - Master of Science (M.Sc.)", degree: "master", language: "english" }
+];
+
 const storageKey = "tum-gpt-projects-v1";
 const activeKey = "tum-gpt-active-project-v1";
 
@@ -72,7 +115,6 @@ const elements = {
   projectTitle: document.querySelector("#projectTitle"),
   projectMeta: document.querySelector("#projectMeta"),
   editProjectBtn: document.querySelector("#editProjectBtn"),
-  deleteProjectBtn: document.querySelector("#deleteProjectBtn"),
   messageList: document.querySelector("#messageList"),
   suggestionButtons: document.querySelectorAll("[data-question]"),
   chatForm: document.querySelector("#chatForm"),
@@ -80,6 +122,7 @@ const elements = {
   projectDialog: document.querySelector("#projectDialog"),
   projectForm: document.querySelector("#projectForm"),
   dialogTitle: document.querySelector("#dialogTitle"),
+  programOptions: document.querySelector("#programOptions"),
   closeDialogBtn: document.querySelector("#closeDialogBtn"),
   cancelProjectBtn: document.querySelector("#cancelProjectBtn")
 };
@@ -104,10 +147,11 @@ function init() {
   elements.newProjectBtn.addEventListener("click", () => openProjectDialog());
   elements.emptyCreateBtn.addEventListener("click", () => openProjectDialog());
   elements.editProjectBtn.addEventListener("click", () => openProjectDialog(getActiveProject()));
-  elements.deleteProjectBtn.addEventListener("click", deleteActiveProject);
   elements.closeDialogBtn.addEventListener("click", closeProjectDialog);
   elements.cancelProjectBtn.addEventListener("click", closeProjectDialog);
   elements.projectForm.addEventListener("submit", saveProjectFromDialog);
+  fields.programName.addEventListener("change", applySelectedProgram);
+  fields.programName.addEventListener("input", applySelectedProgram);
   elements.chatForm.addEventListener("submit", handleChatSubmit);
   elements.chatInput.addEventListener("input", autosizeComposer);
 
@@ -119,6 +163,7 @@ function init() {
     });
   });
 
+  renderProgramOptions();
   render();
 }
 
@@ -166,20 +211,27 @@ function renderProjectList() {
     .map((project) => {
       const active = project.id === activeProjectId ? "active" : "";
       return `
-        <button class="project-item ${active}" type="button" data-project-id="${project.id}">
-          <span>${escapeHtml(project.name)}</span>
-          <small>${escapeHtml(project.programName)}</small>
-        </button>
+        <article class="project-item ${active}" data-project-id="${project.id}">
+          <button class="project-select-button" type="button" data-select-project-id="${project.id}">
+            <span>${escapeHtml(project.name)}</span>
+            <small>${escapeHtml(project.programName)}</small>
+          </button>
+          <button class="project-delete-button" type="button" data-delete-project-id="${project.id}" aria-label="删除 ${escapeHtml(project.name)}"></button>
+        </article>
       `;
     })
     .join("");
 
-  elements.projectList.querySelectorAll("[data-project-id]").forEach((button) => {
+  elements.projectList.querySelectorAll("[data-select-project-id]").forEach((button) => {
     button.addEventListener("click", () => {
-      activeProjectId = button.dataset.projectId;
+      activeProjectId = button.dataset.selectProjectId;
       persist();
       render();
     });
+  });
+
+  elements.projectList.querySelectorAll("[data-delete-project-id]").forEach((button) => {
+    button.addEventListener("click", () => deleteProject(button.dataset.deleteProjectId));
   });
 }
 
@@ -260,14 +312,40 @@ function buildWelcomeMessage(project) {
 
 function deleteActiveProject() {
   const activeProject = getActiveProject();
+  if (activeProject) deleteProject(activeProject.id);
+}
+
+function deleteProject(projectId) {
+  const activeProject = projects.find((project) => project.id === projectId);
   if (!activeProject) return;
   const confirmed = window.confirm(`确定删除「${activeProject.name}」吗？这个 Project 的聊天记录也会删除。`);
   if (!confirmed) return;
 
-  projects = projects.filter((project) => project.id !== activeProject.id);
+  projects = projects.filter((project) => project.id !== projectId);
   activeProjectId = projects[0]?.id || null;
   persist();
   render();
+}
+
+function renderProgramOptions() {
+  elements.programOptions.innerHTML = tumPrograms
+    .map((program) => `<option value="${escapeHtml(program.name)}"></option>`)
+    .join("");
+}
+
+function applySelectedProgram() {
+  const selected = tumPrograms.find((program) => program.name === fields.programName.value.trim());
+  if (!selected) return;
+
+  fields.degree.value = selected.degree;
+  fields.language.value = selected.language;
+
+  if (!fields.projectName.value.trim()) {
+    fields.projectName.value = selected.name
+      .replace(/\s-\s(Bachelor|Master).+$/, "")
+      .replace("Electrical Engineering and Information Technology", "TUM EI")
+      .replace("Information Engineering", "TUM IE");
+  }
 }
 
 function handleChatSubmit(event) {

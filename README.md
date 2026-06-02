@@ -60,6 +60,7 @@ node scripts/local-server.js
 - ChatGPT 风格单窗口对话界面
 - Project 管理：不同申请专业使用不同 Project
 - 每个 Project 独立保存专业信息和聊天记录
+- 申请专业输入支持 TUM 专业选项搜索，输入关键词即可匹配常见 TUM Bachelor / Master 项目
 - Project 信息包含：Bachelor / Master、专业名称、申请类型、学历来源、国家/地区、授课语言、VPD 状态、目标学期、deadline 和备注
 - 基于当前 Project 背景回答 VPD、APS、语言证明、材料格式、高年级入学、录取程序和 Immatrikulation 问题
 - 回答附带建议下一步

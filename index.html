@@ -48,7 +48,6 @@
             </div>
             <div class="header-actions">
               <button id="editProjectBtn" class="ghost-button" type="button">编辑信息</button>
-              <button id="deleteProjectBtn" class="danger-button" type="button">删除</button>
             </div>
           </header>
 
@@ -87,7 +86,15 @@
           </label>
           <label>
             申请专业
-            <input id="programNameInput" name="programName" placeholder="例如：Electrical Engineering and Information Technology" required />
+            <input
+              id="programNameInput"
+              name="programName"
+              list="programOptions"
+              placeholder="输入关键词，例如：Electrical / Informatics / Management"
+              autocomplete="off"
+              required
+            />
+            <datalist id="programOptions"></datalist>
           </label>
           <label>
             学位阶段
