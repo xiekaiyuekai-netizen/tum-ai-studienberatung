@@ -119,6 +119,7 @@ const elements = {
   suggestionButtons: document.querySelectorAll("[data-question]"),
   chatForm: document.querySelector("#chatForm"),
   chatInput: document.querySelector("#chatInput"),
+  sendButton: document.querySelector(".send-button"),
   projectDialog: document.querySelector("#projectDialog"),
   projectForm: document.querySelector("#projectForm"),
   dialogTitle: document.querySelector("#dialogTitle"),
@@ -348,7 +349,7 @@ function applySelectedProgram() {
   }
 }
 
-function handleChatSubmit(event) {
+async function handleChatSubmit(event) {
   event.preventDefault();
   const activeProject = getActiveProject();
   const question = elements.chatInput.value.trim();
@@ -360,13 +361,85 @@ function handleChatSubmit(event) {
     createdAt: new Date().toISOString()
   };
 
-  const assistantMessage = answerQuestion(question, activeProject);
+  const assistantMessage = {
+    role: "assistant",
+    text: "正在检索 TUM 官方资料，并调用 OpenAI 生成回答...",
+    sourceKeys: ["portal", "online"],
+    isLoading: true,
+    createdAt: new Date().toISOString()
+  };
+
   activeProject.messages.push(userMessage, assistantMessage);
   activeProject.updatedAt = new Date().toISOString();
   elements.chatInput.value = "";
   autosizeComposer();
+  elements.sendButton.disabled = true;
   persist();
   render();
+
+  try {
+    const aiMessage = await requestAiAnswer(question, activeProject);
+    Object.assign(assistantMessage, aiMessage, { isLoading: false });
+  } catch (error) {
+    const fallbackMessage = answerQuestion(question, activeProject);
+    Object.assign(assistantMessage, fallbackMessage, {
+      text: `${fallbackMessage.text}\n\n（AI API 暂时不可用，已切换到本地规则回答。原因：${error.message}）`,
+      isLoading: false,
+      mode: "local-fallback"
+    });
+  } finally {
+    activeProject.updatedAt = new Date().toISOString();
+    elements.sendButton.disabled = false;
+    persist();
+    render();
+  }
+}
+
+async function requestAiAnswer(question, project) {
+  const response = await fetch("/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      question,
+      project: serializeProject(project),
+      history: project.messages
+        .filter((message) => !message.isLoading)
+        .slice(-8)
+        .map((message) => ({ role: message.role, text: message.text }))
+    })
+  });
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(data.hint || data.error || "API 请求失败");
+  }
+
+  return {
+    role: "assistant",
+    text: data.answer,
+    actions: data.actions || [],
+    sourceKeys: data.sources || [],
+    model: data.model,
+    mode: data.mode,
+    createdAt: new Date().toISOString()
+  };
+}
+
+function serializeProject(project) {
+  return {
+    name: project.name,
+    programName: project.programName,
+    degree: project.degree,
+    applicationType: project.applicationType,
+    qualification: project.qualification,
+    country: project.country,
+    language: project.language,
+    vpd: project.vpd,
+    semester: project.semester,
+    deadline: project.deadline,
+    notes: project.notes
+  };
 }
 
 function answerQuestion(question, project) {
@@ -499,9 +572,10 @@ function renderMessage(message) {
     <article class="message assistant-message">
       <div class="avatar">T</div>
       <div class="message-body">
-        <div class="message-content">${escapeHtml(message.text)}</div>
+        <div class="message-content ${message.isLoading ? "loading-text" : ""}">${escapeHtml(message.text)}</div>
         ${message.actions?.length ? renderActions(message.actions) : ""}
         ${message.sourceKeys?.length ? renderSources(message.sourceKeys) : ""}
+        ${message.model ? `<div class="model-note">AI: ${escapeHtml(message.model)}</div>` : ""}
       </div>
     </article>
   `;
@@ -517,9 +591,13 @@ function renderActions(actions) {
 }
 
 function renderSources(sourceKeys) {
+  const entries = sourceKeys
+    .map((source) => (typeof source === "string" ? getSource(source) : source))
+    .filter(Boolean);
+
   return `
     <div class="source-row">
-      ${sourceKeys.map((key) => renderSourceLink(getSource(key))).join("")}
+      ${entries.map((source) => renderSourceLink(source)).join("")}
     </div>
   `;
 }

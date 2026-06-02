@@ -12,15 +12,15 @@ https://tum-ai-studienberatung-nez9.vercel.app
 
 ## 为什么比 RAG 项目更适合入门
 
-这个项目不用向量数据库、不用文档切片、不用复杂后端。核心是：
+这个项目使用轻量 RAG，不接向量数据库，先用本地 TUM 官方资料摘要做关键词检索，再把检索结果和 Project 信息交给 OpenAI API 生成回答。核心是：
 
 ```text
-新建 Project -> 填写专业信息 -> 基于 Project 背景提问 -> 生成建议 -> 官方来源链接
+新建 Project -> 填写专业信息 -> 检索 TUM 资料 -> OpenAI 生成回答 -> 官方来源链接
 ```
 
 简历上可以写：
 
-> Built a ChatGPT-style Chinese TUM application advising assistant with project-based application profiles, independent chat histories for different programs, rule-based Q&A, VPD/APS and higher-semester guidance, official-source links, and Vercel deployment.
+> Built a ChatGPT-style Chinese TUM application advising assistant with project-based application profiles, lightweight RAG over official TUM guidance, OpenAI API-backed Q&A, independent chat histories, VPD/APS and higher-semester guidance, source-grounded responses, and Vercel deployment.
 
 ## 本地运行
 
@@ -49,11 +49,24 @@ node scripts/local-server.js
 3. 点击 `Add New Project`
 4. 选择 `xiekaiyuekai-netizen/tum-ai-studienberatung`
 5. Framework Preset 选择 `Other`
-6. Build Command 留空
+6. Build Command 填 `npm run build`
 7. Output Directory 使用 `public`
 8. 点击 `Deploy`
 
-这个项目是静态页面，不依赖后端 API。仓库里提交了 `public/` 静态产物，Vercel 只需要托管 `public`。本地的开发服务器放在 `scripts/local-server.js`，不会作为 Vercel Serverless Function 运行。
+这个项目包含静态页面和 Vercel Serverless Function：
+
+- 页面入口在 `public/`
+- AI 接口在 `/api/chat`
+- OpenAI API key 必须放在 Vercel 环境变量里，不能写进前端代码或提交到 GitHub
+
+Vercel 环境变量：
+
+```text
+OPENAI_API_KEY=你的新 OpenAI API key
+OPENAI_MODEL=gpt-5-mini
+```
+
+`OPENAI_MODEL` 可以不填，默认使用 `gpt-5-mini`。
 
 ## 功能
 
@@ -63,6 +76,9 @@ node scripts/local-server.js
 - 申请专业输入支持 TUM 专业选项搜索，输入关键词即可匹配常见 TUM Bachelor / Master 项目
 - Project 信息包含：Bachelor / Master、专业名称、申请类型、学历来源、国家/地区、授课语言、VPD 状态、目标学期、deadline 和备注
 - 基于当前 Project 背景回答 VPD、APS、语言证明、材料格式、高年级入学、录取程序和 Immatrikulation 问题
+- `/api/chat` 调用 OpenAI Responses API 生成中文申请咨询回答
+- 轻量 RAG：先从本地 TUM 官方资料摘要里检索相关内容，再交给模型回答
+- API 不可用时自动回退到本地规则答案
 - 回答附带建议下一步
 - 回答附带 TUM 官方来源链接
 - 常见问题快捷提问

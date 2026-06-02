@@ -448,6 +448,22 @@ p {
   flex: 0 0 auto;
 }
 
+.send-button:disabled {
+  cursor: wait;
+  opacity: 0.62;
+}
+
+.loading-text {
+  color: var(--muted);
+}
+
+.model-note {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
 .project-dialog {
   width: min(760px, calc(100% - 28px));
   border: 1px solid var(--line);

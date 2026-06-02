@@ -4,6 +4,7 @@ const path = require("path");
 
 const root = path.resolve(__dirname, "..");
 const port = Number(process.env.PORT || 4273);
+const chatHandler = require("../api/chat");
 
 const contentTypes = {
   ".html": "text/html; charset=utf-8",
@@ -14,6 +15,12 @@ const contentTypes = {
 
 const server = http.createServer((request, response) => {
   const url = new URL(request.url, `http://${request.headers.host}`);
+
+  if (url.pathname === "/api/chat") {
+    chatHandler(request, response);
+    return;
+  }
+
   const filePath = url.pathname === "/" ? "index.html" : decodeURIComponent(url.pathname.slice(1));
   const resolved = path.resolve(root, filePath);
 
