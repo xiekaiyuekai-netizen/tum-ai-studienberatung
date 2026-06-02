@@ -107,6 +107,7 @@ let activeProjectId = localStorage.getItem(activeKey) || projects[0]?.id || null
 let editingProjectId = null;
 
 const elements = {
+  appShell: document.querySelector(".app-shell"),
   projectList: document.querySelector("#projectList"),
   newProjectBtn: document.querySelector("#newProjectBtn"),
   emptyCreateBtn: document.querySelector("#emptyCreateBtn"),
@@ -167,7 +168,6 @@ function init() {
   });
 
   renderProgramOptions();
-  syncProjectPanel(getActiveProject());
   render();
 }
 
@@ -220,6 +220,7 @@ function renderProjectList() {
             <span>${escapeHtml(project.name)}</span>
             <small>${escapeHtml(project.programName)}</small>
           </button>
+          <button class="project-edit-button" type="button" data-edit-project-id="${project.id}" aria-label="编辑 ${escapeHtml(project.name)}">编辑</button>
           <button class="project-delete-button" type="button" data-delete-project-id="${project.id}" aria-label="删除 ${escapeHtml(project.name)}"></button>
         </article>
       `;
@@ -231,7 +232,15 @@ function renderProjectList() {
       activeProjectId = button.dataset.selectProjectId;
       persist();
       render();
-      syncProjectPanel(getActiveProject());
+    });
+  });
+
+  elements.projectList.querySelectorAll("[data-edit-project-id]").forEach((button) => {
+    button.addEventListener("click", () => {
+      activeProjectId = button.dataset.editProjectId;
+      persist();
+      render();
+      openProjectDialog(getActiveProject());
     });
   });
 
@@ -242,6 +251,9 @@ function renderProjectList() {
 
 function openProjectDialog(project = null) {
   syncProjectPanel(project);
+  elements.projectDialog.hidden = false;
+  elements.appShell.classList.add("panel-open");
+  fields.projectName.focus();
 }
 
 function syncProjectPanel(project = null) {
@@ -262,6 +274,8 @@ function syncProjectPanel(project = null) {
 }
 
 function closeProjectDialog() {
+  elements.projectDialog.hidden = true;
+  elements.appShell.classList.remove("panel-open");
   syncProjectPanel(getActiveProject());
 }
 
@@ -302,7 +316,7 @@ function saveProjectFromDialog(event) {
 
   persist();
   render();
-  syncProjectPanel(getActiveProject());
+  closeProjectDialog();
 }
 
 function buildWelcomeMessage(project) {
@@ -330,7 +344,7 @@ function deleteProject(projectId) {
   activeProjectId = projects[0]?.id || null;
   persist();
   render();
-  syncProjectPanel(getActiveProject());
+  if (editingProjectId === projectId) closeProjectDialog();
 }
 
 function renderProgramOptions() {
@@ -368,7 +382,7 @@ async function handleChatSubmit(event) {
 
   const assistantMessage = {
     role: "assistant",
-    text: "正在检索 TUM 官方资料，并调用 OpenAI 生成回答...",
+    text: "正在检索 TUM 官方资料，并调用 AI 生成回答...",
     sourceKeys: ["portal", "online"],
     isLoading: true,
     createdAt: new Date().toISOString()

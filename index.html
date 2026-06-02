@@ -56,15 +56,16 @@
             <button id="editProjectBtn" class="secondary-button compact-button" type="button">编辑信息</button>
           </header>
 
-          <div class="tabs" aria-label="推荐问题">
-            <button class="tab active" type="button" data-question="我这个专业申请需要先做 VPD 还是先提交 TUMonline？">申请顺序</button>
-            <button class="tab" type="button" data-question="我需要 APS 吗？">APS</button>
-            <button class="tab" type="button" data-question="语言证明什么时候必须上传？">语言证明</button>
-            <button class="tab" type="button" data-question="我申请更高 Fachsemester 需要哪些额外材料？">高年级入学</button>
-            <button class="tab" type="button" data-question="录取以后 Immatrikulation 怎么做？">注册流程</button>
-          </div>
-
           <div id="messageList" class="message-list" aria-live="polite"></div>
+
+          <div class="keyword-row" aria-label="推荐关键词">
+            <span class="keyword-label">关键词</span>
+            <button class="keyword-chip active" type="button" data-question="我这个专业申请需要先做 VPD 还是先提交 TUMonline？">申请顺序</button>
+            <button class="keyword-chip" type="button" data-question="我需要 APS 吗？">APS</button>
+            <button class="keyword-chip" type="button" data-question="语言证明什么时候必须上传？">语言证明</button>
+            <button class="keyword-chip" type="button" data-question="我申请更高 Fachsemester 需要哪些额外材料？">高年级入学</button>
+            <button class="keyword-chip" type="button" data-question="录取以后 Immatrikulation 怎么做？">注册流程</button>
+          </div>
 
           <form id="chatForm" class="composer">
             <textarea id="chatInput" rows="2" placeholder="问这个 Project 的申请问题，例如：这个专业需要 VPD 吗？"></textarea>
@@ -76,14 +77,14 @@
         </section>
       </section>
 
-      <aside id="projectDialog" class="project-panel">
+      <aside id="projectDialog" class="project-panel" hidden>
         <form id="projectForm">
           <div class="project-panel-header">
             <div>
               <p class="section-label">Project setup</p>
               <h2 id="dialogTitle" class="project-panel-title">新建申请 Project</h2>
             </div>
-            <button id="closeDialogBtn" class="secondary-button compact-button" type="button">重置</button>
+            <button id="closeDialogBtn" class="panel-close-button" type="button" aria-label="关闭 Project 设置">×</button>
           </div>
 
           <div class="form-body">
