@@ -12,7 +12,7 @@ https://tum-ai-studienberatung-nez9.vercel.app
 
 ## 为什么比 RAG 项目更适合入门
 
-这个项目使用轻量 RAG，不接向量数据库，先用本地 TUM 官方资料摘要做关键词检索，再把检索结果和 Project 信息交给 OpenAI API 生成回答。核心是：
+这个项目使用轻量 RAG，不接向量数据库，先用本地 TUM 官方资料摘要做关键词检索，再把检索结果和 Project 信息交给 DeepSeek / OpenAI 兼容的 LLM API 生成回答。核心是：
 
 ```text
 新建 Project -> 填写专业信息 -> 检索 TUM 资料 -> OpenAI 生成回答 -> 官方来源链接
@@ -20,7 +20,7 @@ https://tum-ai-studienberatung-nez9.vercel.app
 
 简历上可以写：
 
-> Built a ChatGPT-style Chinese TUM application advising assistant with project-based application profiles, lightweight RAG over official TUM guidance, OpenAI API-backed Q&A, independent chat histories, VPD/APS and higher-semester guidance, source-grounded responses, and Vercel deployment.
+> Built a ChatGPT-style Chinese TUM application advising assistant with project-based application profiles, lightweight RAG over official TUM guidance, DeepSeek/OpenAI-compatible API-backed Q&A, independent chat histories, VPD/APS and higher-semester guidance, source-grounded responses, and Vercel deployment.
 
 ## 本地运行
 
@@ -59,14 +59,31 @@ node scripts/local-server.js
 - AI 接口在 `/api/chat`
 - OpenAI API key 必须放在 Vercel 环境变量里，不能写进前端代码或提交到 GitHub
 
-Vercel 环境变量：
+DeepSeek 默认环境变量：
 
 ```text
-OPENAI_API_KEY=你的新 OpenAI API key
-OPENAI_MODEL=gpt-5-mini
+DEEPSEEK_API_KEY=你的 DeepSeek API key
+LLM_MODEL=deepseek-v4-flash
 ```
 
-`OPENAI_MODEL` 可以不填，默认使用 `gpt-5-mini`。
+`LLM_MODEL` 可以不填，默认使用 `deepseek-v4-flash`。
+
+如果以后要切回 OpenAI，可以改成：
+
+```text
+LLM_PROVIDER=openai
+OPENAI_API_KEY=你的 OpenAI API key
+LLM_MODEL=gpt-5-mini
+```
+
+也可以接其他 OpenAI Chat Completions 兼容接口：
+
+```text
+LLM_PROVIDER=deepseek
+DEEPSEEK_API_KEY=你的兼容接口 key
+LLM_API_BASE_URL=https://api.deepseek.com
+LLM_MODEL=deepseek-v4-flash
+```
 
 ## 功能
 
@@ -76,7 +93,7 @@ OPENAI_MODEL=gpt-5-mini
 - 申请专业输入支持 TUM 专业选项搜索，输入关键词即可匹配常见 TUM Bachelor / Master 项目
 - Project 信息包含：Bachelor / Master、专业名称、申请类型、学历来源、国家/地区、授课语言、VPD 状态、目标学期、deadline 和备注
 - 基于当前 Project 背景回答 VPD、APS、语言证明、材料格式、高年级入学、录取程序和 Immatrikulation 问题
-- `/api/chat` 调用 OpenAI Responses API 生成中文申请咨询回答
+- `/api/chat` 调用 DeepSeek / OpenAI 兼容 Chat Completions API 生成中文申请咨询回答
 - 轻量 RAG：先从本地 TUM 官方资料摘要里检索相关内容，再交给模型回答
 - API 不可用时自动回退到本地规则答案
 - 回答附带建议下一步

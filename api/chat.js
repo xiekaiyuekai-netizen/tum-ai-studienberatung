@@ -1,6 +1,17 @@
 const { retrieveKnowledge } = require("./knowledge");
 
-const defaultModel = "gpt-5-mini";
+const providerConfig = {
+  deepseek: {
+    keyEnv: "DEEPSEEK_API_KEY",
+    baseUrl: "https://api.deepseek.com",
+    model: "deepseek-v4-flash"
+  },
+  openai: {
+    keyEnv: "OPENAI_API_KEY",
+    baseUrl: "https://api.openai.com/v1",
+    model: "gpt-5-mini"
+  }
+};
 
 module.exports = async function handler(request, response) {
   setCorsHeaders(response);
@@ -27,10 +38,12 @@ module.exports = async function handler(request, response) {
       return;
     }
 
-    if (!process.env.OPENAI_API_KEY) {
+    const provider = getProviderConfig();
+
+    if (!provider.apiKey) {
       sendJson(response, 500, {
-        error: "OPENAI_API_KEY is not configured.",
-        hint: "请在 Vercel 环境变量里配置 OPENAI_API_KEY。"
+        error: `${provider.keyEnv} is not configured.`,
+        hint: `请在 Vercel 环境变量里配置 ${provider.keyEnv}。`
       });
       return;
     }
@@ -42,17 +55,17 @@ module.exports = async function handler(request, response) {
       })
       .join("\n\n");
 
-    const apiResponse = await fetch("https://api.openai.com/v1/responses", {
+    const apiResponse = await fetch(`${provider.baseUrl}/chat/completions`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        Authorization: `Bearer ${provider.apiKey}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: process.env.OPENAI_MODEL || defaultModel,
-        input: [
+        model: provider.model,
+        messages: [
           {
-            role: "developer",
+            role: "system",
             content:
               "你是一个中文 TUM 申请咨询助手。只基于提供的 TUM 官方资料摘要和用户 Project 信息回答。不要编造专业特殊要求；不确定时要求用户核对具体专业页面和 TUMonline。回答要清晰、具体、适合申请者。"
           },
@@ -61,7 +74,8 @@ module.exports = async function handler(request, response) {
             content: buildPrompt({ question, project, history, context })
           }
         ],
-        max_output_tokens: 900
+        max_tokens: 900,
+        temperature: 0.3
       })
     });
 
@@ -75,16 +89,33 @@ module.exports = async function handler(request, response) {
     }
 
     sendJson(response, 200, {
-      answer: extractOutputText(data),
+      answer: extractChatCompletionText(data),
       actions: buildActions(project, question).slice(0, 5),
       sources: dedupeSources(retrievedChunks.map((chunk) => chunk.source)),
-      model: data.model || process.env.OPENAI_MODEL || defaultModel,
-      mode: "openai-rag"
+      model: data.model || provider.model,
+      mode: `${provider.name}-rag`
     });
   } catch (error) {
     sendJson(response, 500, { error: error.message || "Server error." });
   }
 };
+
+function getProviderConfig() {
+  const providerName = String(process.env.LLM_PROVIDER || "deepseek").toLowerCase();
+  const base = providerConfig[providerName] || providerConfig.deepseek;
+
+  return {
+    name: providerConfig[providerName] ? providerName : "deepseek",
+    keyEnv: base.keyEnv,
+    apiKey: process.env[base.keyEnv],
+    baseUrl: normalizeBaseUrl(process.env.LLM_API_BASE_URL || base.baseUrl),
+    model: process.env.LLM_MODEL || process.env.DEEPSEEK_MODEL || base.model
+  };
+}
+
+function normalizeBaseUrl(value) {
+  return String(value || "").replace(/\/+$/, "");
+}
 
 function buildPrompt({ question, project, history, context }) {
   return `
@@ -134,16 +165,8 @@ function buildActions(project, question) {
   return actions;
 }
 
-function extractOutputText(data) {
-  if (data.output_text) return data.output_text.trim();
-
-  const pieces = [];
-  for (const item of data.output || []) {
-    for (const content of item.content || []) {
-      if (content.type === "output_text" && content.text) pieces.push(content.text);
-    }
-  }
-  return pieces.join("\n").trim() || "我暂时没有生成有效回答，请稍后重试。";
+function extractChatCompletionText(data) {
+  return data?.choices?.[0]?.message?.content?.trim() || "我暂时没有生成有效回答，请稍后重试。";
 }
 
 function dedupeSources(items) {
