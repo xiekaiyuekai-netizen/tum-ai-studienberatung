@@ -7,35 +7,42 @@
     <link rel="stylesheet" href="src/styles.css" />
   </head>
   <body>
+    <header class="app-header">
+      <div class="header-brand">
+        <div class="header-logo">TUM</div>
+        <div class="app-title">TUM GPT 申请咨询助手</div>
+      </div>
+      <nav class="header-actions" aria-label="辅助导航">
+        <button type="button">使用指南</button>
+        <button type="button">中文</button>
+      </nav>
+    </header>
+
     <main class="app-shell">
       <aside class="sidebar">
-        <div class="brand">
-          <div class="brand-mark">T</div>
-          <div>
-            <strong>TUM GPT</strong>
-            <span>申请咨询助手</span>
-          </div>
-        </div>
-
-        <button id="newProjectBtn" class="new-project-button" type="button">新建申请 Project</button>
+        <button id="newProjectBtn" class="new-project-button" type="button">+ 新建申请 Project</button>
 
         <section class="project-section">
-          <div class="section-label">Projects</div>
+          <div class="sidebar-section-title">Projects</div>
           <div id="projectList" class="project-list"></div>
         </section>
 
         <div class="sidebar-note">
           <strong>非官方 Demo</strong>
-          <p>回答基于 TUM 官网公开信息整理，最终以具体专业页面、TUMonline 和 TUM 官网为准。</p>
+          <p>免责声明：回答基于 TUM 官网公开信息整理，最终以具体专业页面、TUMonline 和 TUM 官网为准。</p>
         </div>
       </aside>
 
       <section class="chat-main">
         <div id="emptyState" class="empty-state">
           <div class="empty-inner">
-            <div class="app-badge">TUM 申请版 ChatGPT</div>
-            <h1>先为一个申请专业创建 Project</h1>
-            <p>每个 Project 保存独立的专业信息和聊天记录。申请不同专业时，新建不同 Project，避免材料要求和流程混在一起。</p>
+            <h1 class="main-title">TUM 申请版 ChatGPT</h1>
+            <div class="info-box">
+              <div class="info-box-title">请先创建一个申请 Project</div>
+              <p class="info-box-text">
+                每个 Project 保存独立的专业信息和聊天记录。申请不同专业时，新建不同 Project，避免材料要求和流程混在一起。
+              </p>
+            </div>
             <button id="emptyCreateBtn" class="primary-button" type="button">创建第一个 Project</button>
           </div>
         </div>
@@ -44,130 +51,147 @@
           <header class="chat-header">
             <div>
               <p id="projectMeta" class="project-meta"></p>
-              <h1 id="projectTitle"></h1>
+              <h1 id="projectTitle" class="main-title"></h1>
             </div>
-            <div class="header-actions">
-              <button id="editProjectBtn" class="ghost-button" type="button">编辑信息</button>
-            </div>
+            <button id="editProjectBtn" class="secondary-button compact-button" type="button">编辑信息</button>
           </header>
+
+          <div class="tabs" aria-label="推荐问题">
+            <button class="tab active" type="button" data-question="我这个专业申请需要先做 VPD 还是先提交 TUMonline？">申请顺序</button>
+            <button class="tab" type="button" data-question="我需要 APS 吗？">APS</button>
+            <button class="tab" type="button" data-question="语言证明什么时候必须上传？">语言证明</button>
+            <button class="tab" type="button" data-question="我申请更高 Fachsemester 需要哪些额外材料？">高年级入学</button>
+            <button class="tab" type="button" data-question="录取以后 Immatrikulation 怎么做？">注册流程</button>
+          </div>
 
           <div id="messageList" class="message-list" aria-live="polite"></div>
 
-          <div class="suggestion-row" aria-label="推荐问题">
-            <button type="button" data-question="我这个专业申请需要先做 VPD 还是先提交 TUMonline？">申请顺序</button>
-            <button type="button" data-question="我需要 APS 吗？">APS</button>
-            <button type="button" data-question="语言证明什么时候必须上传？">语言证明</button>
-            <button type="button" data-question="我申请更高 Fachsemester 需要哪些额外材料？">高年级入学</button>
-            <button type="button" data-question="录取以后 Immatrikulation 怎么做？">注册流程</button>
-          </div>
-
           <form id="chatForm" class="composer">
-            <textarea id="chatInput" rows="1" placeholder="问这个 Project 的申请问题，例如：这个专业需要 VPD 吗？"></textarea>
-            <button class="send-button" type="submit">发送</button>
+            <textarea id="chatInput" rows="2" placeholder="问这个 Project 的申请问题，例如：这个专业需要 VPD 吗？"></textarea>
+            <div class="input-footer">
+              <span class="char-count">基于当前 Project 和 TUM 官方资料回答</span>
+              <button class="send-button" type="submit">发送</button>
+            </div>
           </form>
         </section>
       </section>
-    </main>
 
-    <dialog id="projectDialog" class="project-dialog">
-      <form id="projectForm" method="dialog">
-        <div class="dialog-header">
-          <div>
-            <p class="section-label">Project setup</p>
-            <h2 id="dialogTitle">新建申请 Project</h2>
+      <aside id="projectDialog" class="project-panel">
+        <form id="projectForm">
+          <div class="project-panel-header">
+            <div>
+              <p class="section-label">Project setup</p>
+              <h2 id="dialogTitle" class="project-panel-title">新建申请 Project</h2>
+            </div>
+            <button id="closeDialogBtn" class="secondary-button compact-button" type="button">重置</button>
           </div>
-          <button id="closeDialogBtn" class="icon-button" type="button" aria-label="关闭">×</button>
-        </div>
 
-        <div class="form-grid">
-          <label>
-            Project 名称
-            <input id="projectNameInput" name="projectName" placeholder="例如：TUM EI Master" required />
-          </label>
-          <label>
-            申请专业
-            <input
-              id="programNameInput"
-              name="programName"
-              list="programOptions"
-              placeholder="输入关键词，例如：Electrical / Informatics / Management"
-              autocomplete="off"
-              required
-            />
-            <datalist id="programOptions"></datalist>
-          </label>
-          <label>
-            学位阶段
-            <select id="degreeInput" name="degree">
-              <option value="master">Master</option>
-              <option value="bachelor">Bachelor</option>
-            </select>
-          </label>
-          <label>
-            申请类型
-            <select id="applicationTypeInput" name="applicationType">
-              <option value="first-semester">第一学期入学</option>
-              <option value="higher-semester">更高 Fachsemester</option>
-            </select>
-          </label>
-          <label>
-            学历来源
-            <select id="qualificationInput" name="qualification">
-              <option value="outside-germany">德国以外</option>
-              <option value="germany">德国</option>
-            </select>
-          </label>
-          <label>
-            学历国家/地区
-            <select id="countryInput" name="country">
-              <option value="china">中国</option>
-              <option value="india">印度</option>
-              <option value="vietnam">越南</option>
-              <option value="eu">欧盟/欧洲经济区</option>
-              <option value="other">其他国家/地区</option>
-            </select>
-          </label>
-          <label>
-            授课语言
-            <select id="languageInput" name="language">
-              <option value="english">英语</option>
-              <option value="german">德语</option>
-              <option value="mixed">英德混合</option>
-            </select>
-          </label>
-          <label>
-            VPD 状态
-            <select id="vpdInput" name="vpd">
-              <option value="not-started">还没申请</option>
-              <option value="submitted">已向 uni-assist 提交</option>
-              <option value="received">已收到最终 VPD</option>
-              <option value="not-needed">不确定/可能不需要</option>
-            </select>
-          </label>
-          <label>
-            目标学期
-            <select id="semesterInput" name="semester">
-              <option value="winter">Winter Semester</option>
-              <option value="summer">Summer Semester</option>
-            </select>
-          </label>
-          <label>
-            申请截止日期
-            <input id="deadlineInput" name="deadline" placeholder="例如：2026-05-31 / 不确定" />
-          </label>
-        </div>
+          <div class="form-body">
+            <label class="form-group">
+              <span class="form-label">Project 名称 <span class="required">*</span></span>
+              <input id="projectNameInput" class="form-input" name="projectName" placeholder="例如：TUM EI Master" required />
+            </label>
 
-        <label class="full-field">
-          备注
-          <textarea id="notesInput" name="notes" rows="3" placeholder="例如：本科在中国完成，目标是 2026 Winter Semester，准备申请高年级入学。"></textarea>
-        </label>
+            <label class="form-group">
+              <span class="form-label">申请专业 <span class="required">*</span></span>
+              <input
+                id="programNameInput"
+                class="form-input"
+                name="programName"
+                list="programOptions"
+                placeholder="输入关键词，例如：Electrical / Informatics / Management"
+                autocomplete="off"
+                required
+              />
+              <datalist id="programOptions"></datalist>
+            </label>
 
-        <div class="dialog-actions">
-          <button class="ghost-button" id="cancelProjectBtn" type="button">取消</button>
-          <button class="primary-button" type="submit">保存 Project</button>
-        </div>
-      </form>
-    </dialog>
+            <label class="form-group">
+              <span class="form-label">学位阶段</span>
+              <select id="degreeInput" class="form-select" name="degree">
+                <option value="master">Master</option>
+                <option value="bachelor">Bachelor</option>
+              </select>
+            </label>
+
+            <label class="form-group">
+              <span class="form-label">申请类型</span>
+              <select id="applicationTypeInput" class="form-select" name="applicationType">
+                <option value="first-semester">第一学期入学</option>
+                <option value="higher-semester">更高 Fachsemester</option>
+              </select>
+            </label>
+
+            <label class="form-group">
+              <span class="form-label">学历来源</span>
+              <select id="qualificationInput" class="form-select" name="qualification">
+                <option value="outside-germany">德国以外</option>
+                <option value="germany">德国</option>
+              </select>
+            </label>
+
+            <label class="form-group">
+              <span class="form-label">学历国家/地区</span>
+              <select id="countryInput" class="form-select" name="country">
+                <option value="china">中国</option>
+                <option value="india">印度</option>
+                <option value="vietnam">越南</option>
+                <option value="eu">欧盟/欧洲经济区</option>
+                <option value="other">其他国家/地区</option>
+              </select>
+            </label>
+
+            <label class="form-group">
+              <span class="form-label">授课语言</span>
+              <select id="languageInput" class="form-select" name="language">
+                <option value="english">英语</option>
+                <option value="german">德语</option>
+                <option value="mixed">英德混合</option>
+              </select>
+            </label>
+
+            <label class="form-group">
+              <span class="form-label">VPD 状态</span>
+              <select id="vpdInput" class="form-select" name="vpd">
+                <option value="not-started">还没申请</option>
+                <option value="submitted">已向 uni-assist 提交</option>
+                <option value="received">已收到最终 VPD</option>
+                <option value="not-needed">不确定/可能不需要</option>
+              </select>
+            </label>
+
+            <label class="form-group">
+              <span class="form-label">目标学期</span>
+              <select id="semesterInput" class="form-select" name="semester">
+                <option value="winter">Winter Semester</option>
+                <option value="summer">Summer Semester</option>
+              </select>
+            </label>
+
+            <label class="form-group">
+              <span class="form-label">申请截止日期</span>
+              <input id="deadlineInput" class="form-input" name="deadline" placeholder="例如：2026-05-31 / 不确定" />
+            </label>
+
+            <label class="form-group">
+              <span class="form-label">备注</span>
+              <textarea
+                id="notesInput"
+                class="form-textarea"
+                name="notes"
+                rows="3"
+                placeholder="例如：本科在中国完成，目标是 2026 Winter Semester，准备申请高年级入学。"
+              ></textarea>
+            </label>
+          </div>
+
+          <div class="project-panel-footer">
+            <button class="secondary-button" id="cancelProjectBtn" type="button">取消</button>
+            <button class="primary-button" type="submit">保存 Project</button>
+          </div>
+        </form>
+      </aside>
+    </main>
 
     <script src="src/app.js"></script>
   </body>

@@ -158,6 +158,8 @@ function init() {
 
   elements.suggestionButtons.forEach((button) => {
     button.addEventListener("click", () => {
+      elements.suggestionButtons.forEach((item) => item.classList.remove("active"));
+      button.classList.add("active");
       elements.chatInput.value = button.dataset.question;
       autosizeComposer();
       elements.chatInput.focus();
@@ -165,6 +167,7 @@ function init() {
   });
 
   renderProgramOptions();
+  syncProjectPanel(getActiveProject());
   render();
 }
 
@@ -204,7 +207,7 @@ function render() {
 
 function renderProjectList() {
   if (!projects.length) {
-    elements.projectList.innerHTML = '<div class="project-empty">还没有 Project</div>';
+    elements.projectList.innerHTML = '<div class="project-empty">暂无 Project<br />点击上方按钮创建<br />您的第一个申请 Project</div>';
     return;
   }
 
@@ -228,6 +231,7 @@ function renderProjectList() {
       activeProjectId = button.dataset.selectProjectId;
       persist();
       render();
+      syncProjectPanel(getActiveProject());
     });
   });
 
@@ -237,6 +241,10 @@ function renderProjectList() {
 }
 
 function openProjectDialog(project = null) {
+  syncProjectPanel(project);
+}
+
+function syncProjectPanel(project = null) {
   editingProjectId = project?.id || null;
   elements.dialogTitle.textContent = project ? "编辑申请 Project" : "新建申请 Project";
 
@@ -251,14 +259,10 @@ function openProjectDialog(project = null) {
   fields.semester.value = project?.semester || "winter";
   fields.deadline.value = project?.deadline || "";
   fields.notes.value = project?.notes || "";
-
-  elements.projectDialog.showModal();
-  fields.projectName.focus();
 }
 
 function closeProjectDialog() {
-  elements.projectDialog.close();
-  editingProjectId = null;
+  syncProjectPanel(getActiveProject());
 }
 
 function saveProjectFromDialog(event) {
@@ -297,8 +301,8 @@ function saveProjectFromDialog(event) {
   }
 
   persist();
-  closeProjectDialog();
   render();
+  syncProjectPanel(getActiveProject());
 }
 
 function buildWelcomeMessage(project) {
@@ -326,6 +330,7 @@ function deleteProject(projectId) {
   activeProjectId = projects[0]?.id || null;
   persist();
   render();
+  syncProjectPanel(getActiveProject());
 }
 
 function renderProgramOptions() {
