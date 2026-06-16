@@ -92,6 +92,11 @@ module.exports = async function handler(request, response) {
       answer: extractChatCompletionText(data),
       actions: buildActions(project, question).slice(0, 5),
       sources: dedupeSources(retrievedChunks.map((chunk) => chunk.source)),
+      contexts: retrievedChunks.map((chunk) => ({
+        title: chunk.source.title,
+        url: chunk.source.url,
+        text: chunk.text
+      })),
       model: data.model || provider.model,
       mode: `${provider.name}-rag`
     });

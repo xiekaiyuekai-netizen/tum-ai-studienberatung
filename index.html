@@ -27,6 +27,11 @@
           <div id="projectList" class="project-list"></div>
         </section>
 
+        <section class="knowledge-section">
+          <div class="sidebar-section-title" data-i18n="knowledgeTitle">TUM Knowledge Base</div>
+          <div id="knowledgeList" class="knowledge-list"></div>
+        </section>
+
         <div class="sidebar-note">
           <strong data-i18n="demoTitle">非官方 Demo</strong>
           <p data-i18n="disclaimerShort">免责声明：回答基于 TUM 官网公开信息整理，最终以具体专业页面、TUMonline 和 TUM 官网为准。</p>
@@ -215,6 +220,15 @@
             <li>需要修改 Project 信息时，点击左侧 Project 卡片里的“编辑”。</li>
           </ol>
 
+          <h3>这个 Demo 的 RAG 思路</h3>
+          <ol>
+            <li>资料库参考 RAGFlow 的知识库思路：系统会维护一组 TUM 官方来源页面。</li>
+            <li>提问时会先根据当前 Project 信息识别申请意图，例如 VPD、APS、语言证明或高年级入学。</li>
+            <li>系统会按 LightRAG 的轻量思路，把 Project 背景转成申请规则，例如“非德国学历 -> VPD”“中国学历 -> APS”。</li>
+            <li>AI 回答不是凭空生成，而是基于检索到的 TUM 官方资料摘要、Project 信息和聊天上下文。</li>
+            <li>每次回答下方的“RAG 检索依据”会展示本次实际参考的资料片段。</li>
+          </ol>
+
           <div class="guide-disclaimer">
             <strong>免责声明</strong>
             <p>
@@ -233,6 +247,15 @@
             <li>Ask questions in the chat box. The assistant uses the current Project context and TUM official guidance summaries.</li>
             <li>Use the keyword buttons above the input box to insert common application questions quickly.</li>
             <li>To update Project information, click “Edit” inside the Project card on the left.</li>
+          </ol>
+
+          <h3>RAG design in this demo</h3>
+          <ol>
+            <li>The knowledge base follows the RAGFlow idea of keeping visible official source pages.</li>
+            <li>When you ask a question, the system first detects the application intent, such as VPD, APS, language proof or higher semester entry.</li>
+            <li>Following a lightweight LightRAG-style approach, the Project profile is mapped to rules such as “non-German qualification -> VPD” and “China qualification -> APS”.</li>
+            <li>The AI answer is grounded in retrieved TUM guidance summaries, Project context and recent chat history.</li>
+            <li>The “Retrieved Contexts” section under each answer shows the sources used for that response.</li>
           </ol>
 
           <div class="guide-disclaimer">

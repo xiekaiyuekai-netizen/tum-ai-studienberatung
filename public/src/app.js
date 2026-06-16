@@ -129,7 +129,9 @@ const translations = {
     guideTitle: "使用指南",
     editProject: "编辑申请 Project",
     newProjectTitle: "新建申请 Project",
-    editProjectButton: "编辑"
+    editProjectButton: "编辑",
+    knowledgeTitle: "TUM Knowledge Base",
+    retrievedContexts: "RAG 检索依据"
   },
   en: {
     appTitle: "TUM GPT Application Advisor",
@@ -151,7 +153,9 @@ const translations = {
     guideTitle: "Guide",
     editProject: "Edit Application Project",
     newProjectTitle: "New Application Project",
-    editProjectButton: "Edit"
+    editProjectButton: "Edit",
+    knowledgeTitle: "TUM Knowledge Base",
+    retrievedContexts: "Retrieved Contexts"
   }
 };
 
@@ -164,6 +168,7 @@ const elements = {
   chatView: document.querySelector("#chatView"),
   projectTitle: document.querySelector("#projectTitle"),
   projectMeta: document.querySelector("#projectMeta"),
+  knowledgeList: document.querySelector("#knowledgeList"),
   editProjectBtn: document.querySelector("#editProjectBtn"),
   messageList: document.querySelector("#messageList"),
   suggestionButtons: document.querySelectorAll("[data-question]"),
@@ -225,6 +230,7 @@ function init() {
 
   renderProgramOptions();
   applyLanguage();
+  renderKnowledgeList();
   render();
 }
 
@@ -257,6 +263,7 @@ function applyLanguage() {
   document.querySelectorAll("[data-language]").forEach((node) => {
     node.hidden = node.dataset.language !== currentLanguage;
   });
+  renderKnowledgeList();
 }
 
 function loadProjects() {
@@ -291,6 +298,20 @@ function render() {
   elements.projectMeta.textContent = buildProjectMeta(activeProject);
   elements.messageList.innerHTML = activeProject.messages.map(renderMessage).join("");
   elements.messageList.scrollTop = elements.messageList.scrollHeight;
+}
+
+function renderKnowledgeList() {
+  if (!elements.knowledgeList) return;
+  elements.knowledgeList.innerHTML = sources
+    .map(
+      (source) => `
+        <a href="${source.url}" target="_blank" rel="noreferrer">
+          <span>${escapeHtml(source.title)}</span>
+          <small>${escapeHtml(source.key)}</small>
+        </a>
+      `
+    )
+    .join("");
 }
 
 function renderProjectList() {
@@ -470,8 +491,15 @@ async function handleChatSubmit(event) {
 
   const assistantMessage = {
     role: "assistant",
-    text: "正在检索 TUM 官方资料，并调用 AI 生成回答...",
+    text: "正在检索 TUM 官方资料，匹配 Project 触发规则，并调用 AI 生成回答...",
     sourceKeys: ["portal", "online"],
+    contexts: [
+      {
+        title: "Retrieval pipeline",
+        url: sources[0].url,
+        text: "Project Profile -> Intent Detection -> TUM Knowledge Retrieval -> AI Answer with Sources"
+      }
+    ],
     isLoading: true,
     createdAt: new Date().toISOString()
   };
@@ -527,6 +555,7 @@ async function requestAiAnswer(question, project) {
     text: data.answer,
     actions: data.actions || [],
     sourceKeys: data.sources || [],
+    contexts: data.contexts || [],
     model: data.model,
     mode: data.mode,
     createdAt: new Date().toISOString()
@@ -556,6 +585,14 @@ function answerQuestion(question, project) {
     text: generateAnswer(intent, project),
     actions: buildActions(project, intent.label).slice(0, 5),
     sourceKeys: intent.sources,
+    contexts: intent.sources.map((key) => {
+      const source = getSource(key);
+      return {
+        title: source.title,
+        url: source.url,
+        text: `本地规则根据问题意图匹配到 ${source.title}。请以官方页面和 TUMonline 为准。`
+      };
+    }),
     createdAt: new Date().toISOString()
   };
 }
@@ -681,6 +718,7 @@ function renderMessage(message) {
       <div class="message-body">
         <div class="message-content ${message.isLoading ? "loading-text" : ""}">${escapeHtml(message.text)}</div>
         ${message.actions?.length ? renderActions(message.actions) : ""}
+        ${message.contexts?.length ? renderContexts(message.contexts) : ""}
         ${message.sourceKeys?.length ? renderSources(message.sourceKeys) : ""}
         ${message.model ? '<div class="model-note">AI: TUM 申请助手</div>' : ""}
       </div>
@@ -694,6 +732,27 @@ function renderActions(actions) {
       <strong>建议下一步</strong>
       <ul>${actions.map((action) => `<li>${escapeHtml(action)}</li>`).join("")}</ul>
     </div>
+  `;
+}
+
+function renderContexts(contexts) {
+  return `
+    <details class="context-block" open>
+      <summary>${escapeHtml(translations[currentLanguage].retrievedContexts)}</summary>
+      <ol>
+        ${contexts
+          .slice(0, 5)
+          .map(
+            (context) => `
+              <li>
+                <a href="${context.url}" target="_blank" rel="noreferrer">${escapeHtml(context.title)}</a>
+                <p>${escapeHtml(context.text)}</p>
+              </li>
+            `
+          )
+          .join("")}
+      </ol>
+    </details>
   `;
 }
 

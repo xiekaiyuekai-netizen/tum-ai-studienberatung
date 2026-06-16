@@ -170,6 +170,48 @@ button {
   text-align: center;
 }
 
+.knowledge-section {
+  max-height: 230px;
+  overflow: hidden;
+}
+
+.knowledge-list {
+  display: grid;
+  gap: 6px;
+  max-height: 196px;
+  overflow-y: auto;
+  padding-right: 3px;
+}
+
+.knowledge-list a {
+  display: grid;
+  gap: 2px;
+  border: 1px solid var(--border-default);
+  border-radius: 5px;
+  padding: 7px 8px;
+  background: #ffffff;
+  color: var(--tum-blue-dark);
+  text-decoration: none;
+}
+
+.knowledge-list a:hover {
+  background: var(--tum-blue-light);
+}
+
+.knowledge-list span {
+  overflow: hidden;
+  font-size: 12px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.knowledge-list small {
+  color: var(--text-muted);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
 .project-item {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 36px 26px;
@@ -480,6 +522,50 @@ button {
   margin: 4px 0;
   color: #374151;
   font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.context-block {
+  max-width: 620px;
+  margin-top: 8px;
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  background: #ffffff;
+}
+
+.context-block summary {
+  padding: 8px 10px;
+  color: var(--tum-blue-dark);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.context-block ol {
+  margin: 0;
+  border-top: 1px solid var(--border-default);
+  padding: 8px 12px 10px 28px;
+}
+
+.context-block li {
+  margin: 0 0 8px;
+}
+
+.context-block li:last-child {
+  margin-bottom: 0;
+}
+
+.context-block a {
+  color: var(--tum-blue-dark);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.context-block p {
+  margin: 3px 0 0;
+  color: #4b5563;
+  font-size: 12px;
   line-height: 1.5;
 }
 
